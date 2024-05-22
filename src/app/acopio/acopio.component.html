@@ -1,0 +1,68 @@
+<div>
+  <div *ngIf="!mostrarFormulario" class="table-container">
+    <button (click)="toggleFormulario()">Crear Acopio</button>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Fecha</th>
+          <th>Cliente</th>
+          <th>Region del cliente</th>
+          <th>Chofer</th>
+          <th>Camión</th>
+          <th>Cantidad</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let acopio of acopios">
+          <td>{{ acopio.id_acopio }}</td>
+          <td>{{ acopio.Fecha }}</td>
+          <td>{{ acopio.Cliente_Nombre }}</td>
+          <td>{{acopio.Cliente_Region}}</td>
+          <td>{{ acopio.Chofer_Nombre }}</td>
+          <td>{{ acopio.Camion_Identificador }}</td>
+          <td>{{ acopio.Cantidad }}</td>
+          <td>{{ acopio.Estado }}</td>
+          <td>
+            <button (click)="seleccionarAcopio(acopio)" class="btn-editar">Editar</button>
+            <button (click)="eliminarAcopio(acopio.id_acopio)" class="btn-eliminar">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngIf="mostrarFormulario" class="formulario-container">
+    <h2>{{ modoEdicion ? 'Editar Acopio' : 'Crear Acopio' }}</h2>
+    <form class="formulario" (ngSubmit)="modoEdicion ? actualizarAcopio() : crearAcopio()" >
+      <label for="Fecha">Fecha:</label>
+      <input type="date" id="Fecha" [(ngModel)]="nuevoAcopio.Fecha" name="Fecha" required>
+
+    <label for="id_cliente">Cliente:</label>
+    <select id="id_cliente" [(ngModel)]="nuevoAcopio.id_cliente" name="id_cliente" required>
+    <option *ngFor="let cliente of clientes" [value]="cliente.id_cliente">{{ cliente.Nombre }}</option>
+    </select>
+
+    <label for="id_chofer">Chofer:</label>
+    <select id="id_chofer" [(ngModel)]="nuevoAcopio.id_chofer" name="id_chofer" required>
+      <option *ngFor="let chofer of choferes" [value]="chofer.id_chofer">{{ chofer.Nombre }}</option>
+    </select>
+    
+    <label for="id_camion">Camión:</label>
+    <select id="id_camion" [(ngModel)]="nuevoAcopio.id_camion" name="id_camion" required>
+      <option *ngFor="let camion of camiones" [value]="camion.id_camion">{{ camion.Identificador }}</option>
+    </select>
+
+      <label for="Cantidad">Cantidad:</label>
+      <input type="number" step="0.01" id="Cantidad" [(ngModel)]="nuevoAcopio.Cantidad" name="Cantidad" required>
+
+      <label for="Estado">Estado:</label>
+      <input type="number" id="Estado" [(ngModel)]="nuevoAcopio.Estado" name="Estado" required>
+
+      <button type="submit" class="btn-actualizar">{{ modoEdicion ? 'Actualizar Acopio' : 'Crear Acopio' }}</button>
+      <button type="button" class="btn-cancelar" (click)="cerrarFormulario()">Cerrar</button>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,45 @@
+<div *ngIf="!mostrarFormulario">
+  <button (click)="toggleFormulario()">Crear Camión</button>
+  <table>
+    <tr>
+      <th>IDENTIFICADOR</th>
+      <th>MATRÍCULA</th>
+      <th>MARCA</th>
+      <th>MODELO</th>
+      <th>ACCIONES</th>
+    </tr>
+    <tr *ngFor="let camion of camiones">
+      <td>{{ camion.Identificador }}</td>
+      <td>{{ camion.Matricula }}</td>
+      <td>{{ camion.Marca }}</td>
+      <td>{{ camion.Modelo }}</td>
+      <td>
+        <button (click)="seleccionarCamion(camion)" class="btn-editar" >Editar</button>
+        <button (click)="eliminarCamion(camion.id_camion)"class="btn-eliminar">Eliminar</button>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div *ngIf="mostrarFormulario"  class="formulario-container">
+  <form class="formulario" (submit)="modoEdicion ? actualizarCamion() : crearCamion()" >
+    <label for="identificador">Identificador:</label>
+    <input type="text" id="identificador" name="identificador" [(ngModel)]="nuevoCamion.Identificador" required>
+    <br>
+
+    <label for="matricula">Matrícula:</label>
+    <input type="text" id="matricula" name="matricula" [(ngModel)]="nuevoCamion.Matricula" required>
+    <br>
+
+    <label for="marca">Marca:</label>
+    <input type="text" id="marca" name="marca" [(ngModel)]="nuevoCamion.Marca" required>
+    <br>
+
+    <label for="modelo">Modelo:</label>
+    <input type="text" id="modelo" name="modelo" [(ngModel)]="nuevoCamion.Modelo" required>
+    <br>
+
+    <button type="submit" class="btn-actualizar">{{ modoEdicion ? 'Actualizar Camión' : 'Crear Camión' }}</button>
+    <button type="button"  class="btn-cancelar" (click)="cerrarFormulario()">Cerrar</button>
+  </form>
+</div>

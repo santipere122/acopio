@@ -1,0 +1,64 @@
+<div *ngIf="!mostrarFormulario">
+    <button (click)="toggleFormulario()">Crear Chofer</button> 
+    <table>
+      <tr>
+        <th>NOMBRE</th>
+        <th>DNI</th>
+        <th>REGION</th>
+        <th>CODIGO POSTAL</th>
+        <th>DIRECCION</th>
+        <th>TELEFONO</th>
+        <th>ESTADO</th>
+        <th>ACCIONES</th>
+      </tr>
+      <tr *ngFor="let chofer of choferes">
+        <td>{{ chofer.Nombre }}</td>
+        <td>{{ chofer.Dni }}</td>
+        <td>{{ chofer.Region }}</td>
+        <td>{{ chofer.Codigo_postal }}</td>
+        <td>{{ chofer.Direccion }}</td>
+        <td>{{ chofer.Telefono }}</td>
+        <td>{{ chofer.Estado }}</td>
+        <td>
+          <button (click)="seleccionarChofer(chofer)" class="btn-editar">Editar</button>
+          <button (click)="eliminarChofer(chofer.id_chofer)" class="btn-eliminar">Eliminar</button>
+        </td>
+      </tr>
+    </table>
+  </div>
+  
+  <div *ngIf="mostrarFormulario" class="formulario-container">
+    <form class="formulario" (submit)="modoEdicion ? actualizarChofer() : crearChofer()">
+      <label for="nombre">Nombre:</label>
+      <input type="text" id="nombre" name="nombre" [(ngModel)]="nuevoChofer.Nombre" required>
+      <br>
+  
+      <label for="dni">DNI:</label>
+      <input type="text" id="dni" name="dni" [(ngModel)]="nuevoChofer.Dni" required>
+      <br>
+  
+      <label for="region">Región:</label>
+      <input type="text" id="region" name="region" [(ngModel)]="nuevoChofer.Region" required>
+      <br>
+  
+      <label for="codigoPostal">Código Postal:</label>
+      <input type="text" id="codigoPostal" name="codigoPostal" [(ngModel)]="nuevoChofer.Codigo_postal" required>
+      <br>
+  
+      <label for="direccion">Dirección:</label>
+      <input type="text" id="direccion" name="direccion" [(ngModel)]="nuevoChofer.Direccion" required>
+      <br>
+  
+      <label for="telefono">Teléfono:</label>
+      <input type="tel" id="telefono" name="telefono" [(ngModel)]="nuevoChofer.Telefono" required>
+      <br>
+  
+      <label for="estado">Estado:</label>
+      <input type="number" id="estado" name="estado" [(ngModel)]="nuevoChofer.Estado" required>
+      <br>
+  
+      <button type="submit"  class="btn-actualizar">{{ modoEdicion ? 'Actualizar Chofer' : 'Crear Chofer' }}</button>
+      <button type="button" (click)="cerrarFormulario()" class="btn-cancelar" >Cerrar</button>
+    </form>
+  </div>
+  

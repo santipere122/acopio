@@ -1,27 +1,18 @@
-<router-outlet/>
-<div>
-  <app-user></app-user>
-  <article>
-    <h2>Explorando la majestuosa selva amazónica</h2>
-    <p>En el corazón de la frondosa selva amazónica, donde los rayos del sol apenas se atreven a penetrar la densa vegetación, se encuentra un mundo de misterio y maravilla. Entre las sombras de los árboles milenarios y el murmullo de los arroyos cristalinos, la vida florece en una profusión de colores y sonidos.</p>
-    
-    <p>En este exuberante paraíso terrenal, cada criatura, desde la más diminuta hasta la más imponente, juega su papel en el eterno ciclo de la naturaleza. Los monos aulladores lanzan sus llamadas a través de la espesura, mientras que las mariposas revolotean entre las flores en busca de néctar. Los jaguares acechan sigilosamente a sus presas, mientras que las aves tropicales llenan el aire con sus cantos melodiosos.</p>
-    
-    <h3>Descubriendo la diversidad de la vida selvática</h3>
-    <p>Pero esta tierra de ensueño también alberga peligros ocultos. En lo profundo de la selva, se esconden serpientes venenosas y arañas letales, y los rápidos de los ríos pueden arrastrar incluso al viajero más experimentado hacia sus profundidades turbias. Sin embargo, para aquellos lo suficientemente valientes como para aventurarse en sus confines, la selva amazónica ofrece una experiencia que nunca olvidarán.</p>
-    
-    <blockquote>
-      <p>"Adéntrate en la selva, deja atrás el bullicio del mundo moderno y sumérgete en la magia de este rincón perdido de la Tierra. Quién sabe qué maravillas te esperan entre los árboles ancestrales y los ríos sin fin. La aventura aguarda a aquellos dispuestos a aceptar el desafío."</p>
-      <footer>— Explorador anónimo</footer>
-    </blockquote>
-    
-    <p>Así que, prepárate para una expedición inolvidable hacia lo desconocido. Con cada paso que des, te adentrarás más en un mundo lleno de maravillas y peligros. ¿Estás listo para descubrir los secretos ocultos de la selva amazónica?</p>
-  </article>
-   @defer (on viewport) {
-  <app-comments/>
-} @placeholder {
-  <p>.</p>
-}@loading (){
-  <p>Cargando....</p>
-}
-</div>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<nav>
+    <ul>
+        <button *ngIf="!isLoggedIn()" class="nav-button" (click)="navigateToLogin()">Iniciar Sesión</button>
+        <button *ngIf="isLoggedIn()" class="nav-button" (click)="navigateToUsuario()">{{ getUsername() }}</button>
+        <button class="cliente-button" (click)="navigateToClientes()">Cliente</button>
+        <button class="chofer-button" (click)="navigateToChofer()">Chofer</button>
+        <button class="camion-button"(click)="navigateToCamion()">Camiones</button>
+        <button class="acopio-button"(click)="navigateToAcopio()">Acopio</button>
+        <button class="home-button" (click)="navigateToHome()">
+            <i class="material-icons">home</i>
+        </button>
+        <button class="logout-button" *ngIf="isLoggedIn()" (click)="logout()">Cerrar Sesión</button>
+    </ul>
+</nav>
+
+<router-outlet></router-outlet>
+<h1 *ngIf="isAppRoute">Bienvenido a la Pagina Inicial</h1>
