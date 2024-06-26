@@ -1,18 +1,119 @@
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-<nav>
-    <ul>
-        <button *ngIf="!isLoggedIn()" class="nav-button" (click)="navigateToLogin()">Iniciar Sesión</button>
-        <button *ngIf="isLoggedIn()" class="nav-button" (click)="navigateToUsuario()">{{ getUsername() }}</button>
-        <button class="cliente-button" (click)="navigateToClientes()">Cliente</button>
-        <button class="chofer-button" (click)="navigateToChofer()">Chofer</button>
-        <button class="camion-button"(click)="navigateToCamion()">Camiones</button>
-        <button class="acopio-button"(click)="navigateToAcopio()">Acopio</button>
-        <button class="home-button" (click)="navigateToHome()">
-            <i class="material-icons">home</i>
-        </button>
-        <button class="logout-button" *ngIf="isLoggedIn()" (click)="logout()">Cerrar Sesión</button>
-    </ul>
-</nav>
+<div class="container-fluid">
+  <div class="row">
+    <!-- Sidebar (visible en dispositivos de escritorio) -->
+<!-- Sidebar (visible en dispositivos de escritorio) -->
+<nav id="sidebar" class="col-md-3 col-lg-2 d-none d-md-block bg-dark sidebar" [ngClass]="{'dark-mode': darkMode}">
+    <div class="position-sticky">
+      <button (click)="toggleSidebarWidth()" class="btn btn-dark">
+        <i class="material-icons">chevron_left</i>
+      </button>
+      <!-- Agregar el botón "Home" -->
+      <button class="btn btn-dark" (click)="navigateToHome()">
+        <i class="material-icons">home</i>
+      </button>
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <button *ngIf="!isLoggedIn()" class="nav-link text-white" (click)="navigateToLogin()">
+            <i class="material-icons">login</i> Iniciar Sesión
+          </button>
+        </li>
+        <li class="nav-item">
+          <button *ngIf="isLoggedIn()" class="nav-link text-white" (click)="navigateToUsuario()">{{ getUsername() }}</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link text-white" (click)="navigateToClientes()">
+            <i class="material-icons">group</i> Cliente
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link text-white" (click)="navigateToChofer()">
+            <i class="material-icons">directions_car</i> Chofer
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link text-white" (click)="navigateToCamion()">
+            <i class="material-icons">local_shipping</i> Camiones
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link text-white" (click)="navigateToAcopio()">
+            <i class="material-icons">store</i> Acopio
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link logout-button text-white" *ngIf="isLoggedIn()" (click)="logout()">Cerrar Sesión</button>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  
 
-<router-outlet></router-outlet>
-<h1 *ngIf="isAppRoute">Bienvenido a la Pagina Inicial</h1>
+    <!-- Navbar (visible en dispositivos móviles) -->
+    <nav class="navbar navbar-expand-lg d-md-none">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#"><i class="material-icons">home</i></a>
+        <button class="navbar-toggler custom-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+      
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <button *ngIf="!isLoggedIn()" class="nav-link text-white" (click)="navigateToLogin()">
+                <i class="material-icons">login</i> Iniciar Sesión
+              </button>
+            </li>
+            <li class="nav-item">
+              <button *ngIf="isLoggedIn()" class="nav-link text-white" (click)="navigateToUsuario()">{{ getUsername() }}</button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link text-white" (click)="navigateToClientes()">
+                <i class="material-icons">group</i> Cliente
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link text-white" (click)="navigateToChofer()">
+                <i class="material-icons">directions_car</i> Chofer
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link text-white" (click)="navigateToCamion()">
+                <i class="material-icons">local_shipping</i> Camiones
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link text-white" (click)="navigateToAcopio()">
+                <i class="material-icons">store</i> Acopio
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link text-white" (click)="navigateToHome()">
+                <i class="material-icons">home</i> Home
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link logout-button text-white" *ngIf="isLoggedIn()" (click)="logout()">Cerrar Sesión</button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+      <div class="d-sm-flex justify-content-between align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <button (click)="toggleDarkMode()" class="btn btn-dark">
+          <i class="material-icons">{{ darkMode ? 'light_mode' : 'dark_mode' }}</i>
+          {{ darkMode ? 'Desactivar Modo Oscuro' : 'Activar Modo Oscuro' }}
+        </button>
+      </div>
+      <!-- Main content -->
+      <div class="content">
+        <h1 *ngIf="isAppRoute" class="text-center mb-4">Bienvenido a la Página Inicial</h1>
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+  </div>
+</div>
+
+

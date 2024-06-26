@@ -54,9 +54,23 @@ const VistaAcopio = sequelize.define('vista_acopio', {
     Cantidad: {
         type: DataTypes.FLOAT,
     },
+    ubicacion_acopio:{
+        type: DataTypes.STRING,
+
+    },
     Estado: {
         type: DataTypes.TINYINT,
     },
+    latitud:{
+        type: DataTypes.DECIMAL,
+    },
+    longitud:{
+        type: DataTypes.DECIMAL,
+    },
+    codigo_postal:{
+        type:DataTypes.STRING,
+    }
+ 
 }, {
     tableName: 'vista_acopio',
     timestamps: false,

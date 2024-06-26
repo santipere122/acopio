@@ -26,4 +26,16 @@ export class ClientesService {
   eliminarCliente(id: number): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/${id}`);
   }
+  obtenerEstados(): Observable<any[]> {
+    return this.http.get<any[]>('http://localhost:3000/api/estados');
+  }
+
+  obtenerCondados(codigo_estado: string): Observable<any[]> {
+    return this.http.get<any[]>(`http://localhost:3000/api/condados/${codigo_estado}`);
+  }
+
+  obtenerCiudades(codigo_estado: string, codigo_condado: string): Observable<any[]> {
+    return this.http.get<any[]>(`http://localhost:3000/api/ciudades/${codigo_estado}/${codigo_condado}`);
+  }
+  
 }

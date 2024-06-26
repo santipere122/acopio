@@ -15,6 +15,7 @@ export interface Acopio {
     Camion_Matricula: string;
     Camion_Marca: string;
     Camion_Modelo: string;
+    ubicacion_acopio: string;
     Cantidad: number;
     Estado: number;
   }

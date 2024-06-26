@@ -14,6 +14,7 @@ export class ClientesComponent implements OnInit {
   clientes: Cliente[] = [];
   clienteSeleccionado: Cliente | null = null;
   nuevoCliente: Cliente = this.initNuevoCliente();
+  
 
   constructor(private clientesService: ClientesService, private router: Router) { }
 
@@ -50,7 +51,9 @@ export class ClientesComponent implements OnInit {
         console.error('Error al crear el cliente:', error);
       }
     );
+    
   }
+
 
   seleccionarCliente(cliente: Cliente) {
     this.clienteSeleccionado = { ...cliente };
@@ -118,5 +121,6 @@ export class ClientesComponent implements OnInit {
       Estado: 0
     };
   }
+
 }
 

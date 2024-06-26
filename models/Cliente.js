@@ -57,6 +57,7 @@ const Cliente = sequelize.define('cliente', {
     Estado:{
         type:DataTypes.TINYINT,
     }
+    
 }, {
     tableName: 'cliente',
     timestamps: false, 

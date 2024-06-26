@@ -1,6 +1,5 @@
-import { Component } from '@angular/core';
-import { Router, NavigationEnd } from '@angular/router';
-import { RouterOutlet } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms'; 
 import { UsuarioModule } from './usuario/usuario.module';
@@ -14,13 +13,16 @@ import { AcopioModule } from './acopio/acopio.module';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterOutlet, UsuarioModule, LoginModule,FormsModule,ClientesModule,ChoferesModule,CamionesModule,AcopioModule], 
+  imports: [CommonModule, RouterOutlet, FormsModule, UsuarioModule, LoginModule, ClientesModule, ChoferesModule, CamionesModule, AcopioModule], 
   templateUrl: './app.component.html', 
   styleUrls: ['./app.component.css']     
 })
-
-export class AppComponent {
+export class AppComponent implements OnInit{
   isAppRoute = false;
+  darkMode = false;
+  isMobileView = false;
+  sidebarExpanded: boolean = true;
+
 
   constructor(private authService: AuthService, private router: Router) {
     this.router.events.subscribe(event => {
@@ -28,6 +30,82 @@ export class AppComponent {
         this.isAppRoute = this.router.url === '/';
       }
     });
+  }
+  
+  ngOnInit(): void {
+    this.checkMobileView();
+    window.addEventListener('resize', () => {
+      this.checkMobileView();
+    });
+      const darkModeStorage = localStorage.getItem('darkMode');
+    if (darkModeStorage === 'enabled') {
+      this.enableDarkMode(); 
+    }
+  }
+  
+  toggleDarkMode(): void {
+    this.darkMode = !this.darkMode;
+
+    if (this.darkMode) {
+      localStorage.setItem('darkMode', 'enabled');
+    } else {
+      localStorage.setItem('darkMode', 'disabled');
+    }
+      if (this.darkMode) {
+      this.enableDarkMode();
+    } else {
+      this.disableDarkMode();
+    }
+  }
+  
+  private enableDarkMode(): void {
+    document.body.classList.add('dark-mode');
+  }
+  
+  private disableDarkMode(): void {
+    document.body.classList.remove('dark-mode');
+  }
+
+  toggleSidebarWidth(): void {
+    const sidebar = document.getElementById('sidebar');
+    
+    if (sidebar) {
+      this.sidebarExpanded = !this.sidebarExpanded;
+      
+      if (this.sidebarExpanded) {
+        sidebar.classList.remove('minimized');
+      } else {
+        sidebar.classList.add('minimized');
+      }
+      
+      const navLinks = sidebar.getElementsByClassName('nav-link') as HTMLCollectionOf<HTMLElement>;
+      const logoutButton = sidebar.getElementsByClassName('logout-button')[0] as HTMLElement;
+      
+      if (navLinks.length > 0 && logoutButton) {
+        if (this.sidebarExpanded) {
+          for (let i = 0; i < navLinks.length; i++) {
+            navLinks[i].style.display = 'inline-block';
+          }
+          logoutButton.style.display = 'inline-block';
+        } else {
+          for (let i = 0; i < navLinks.length; i++) {
+            const icon = navLinks[i].getElementsByTagName('i')[0];
+            navLinks[i].innerHTML = ''; 
+            navLinks[i].appendChild(icon);
+            navLinks[i].style.display = 'flex'; 
+          }
+          logoutButton.style.display = 'inline-block';
+        }
+      } else {
+        console.error('Navigation links or logout button not found');
+      }
+    } else {
+      console.error('Sidebar element not found!');
+    }
+  }
+
+  checkMobileView(): void {
+    this.isMobileView = window.innerWidth <= 768;
   }
 
   isLoggedIn(): boolean {
@@ -37,6 +115,7 @@ export class AppComponent {
   logout(): void {
     this.authService.logout();
   }
+
   navigateToLogin(): void {
     this.router.navigate(['/login']);
   }
@@ -48,20 +127,21 @@ export class AppComponent {
   navigateToHome(): void {
     this.router.navigate(['/']);
   }
-  navigateToUsuario():void{
+
+  navigateToUsuario(): void {
     this.router.navigate(['/usuario']);
   }
 
-  navigateToChofer():void{
+  navigateToChofer(): void {
     this.router.navigate(['/chofer']);
   }
 
-  navigateToCamion():void{
+  navigateToCamion(): void {
     this.router.navigate(['/camiones']);
   }
-  
-  navigateToAcopio():void{
-    this.router.navigate(['/acopio'])
+
+  navigateToAcopio(): void {
+    this.router.navigate(['/acopio']);
   }
 
   getUsername() {

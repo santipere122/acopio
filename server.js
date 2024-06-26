@@ -4,11 +4,17 @@ const Sequelize = require('sequelize');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const path = require('path');
+const axios = require('axios');
 const Cliente =require('./models/Cliente.js');
 const Chofer=require('./models/Chofer.js');
 const Camion = require('./models/Camion.js');
+const Estado = require('./models/Estado.js');
+const Condado = require('./models/Condando.js');
+const Ciudad = require('./models/Ciudad.js')
 const VistaAcopio = require('./models/VistaAcopio');
+const { Op } = require('sequelize');
 
+const id_pais = 21; // Único id_pais
 
 const app = express();
 app.use(session({
@@ -254,9 +260,9 @@ app.get('/api/acopios', (req, res) => {
 // Ruta para crear un nuevo acopio
 app.post('/api/acopios/crear', async (req, res) => {
     try {
-        const { Fecha, id_cliente, id_chofer, id_camion, Cantidad, Estado } = req.body;
-        await sequelize.query('CALL CrearAcopio(:Fecha, :id_cliente, :id_chofer, :id_camion, :Cantidad, :Estado)', {
-            replacements: { Fecha, id_cliente, id_chofer, id_camion, Cantidad, Estado }
+        const { Fecha, id_cliente, id_chofer, id_camion, Cantidad, ubicacion_acopio, Estado,latitud,longitud,codigo_postal} = req.body;
+        await sequelize.query('CALL CrearAcopio(:Fecha, :id_cliente, :id_chofer, :id_camion, :Cantidad, :ubicacion_acopio, :Estado,:latitud,:longitud,:codigo_postal)', {
+            replacements: { Fecha, id_cliente, id_chofer, id_camion, Cantidad,ubicacion_acopio, Estado,latitud,longitud,codigo_postal }
         });
         res.json({ mensaje: 'Acopio creado exitosamente' });
     } catch (error) {
@@ -265,14 +271,13 @@ app.post('/api/acopios/crear', async (req, res) => {
     }
 });
 
-
 // Ruta para editar un acopio existente
 app.put('/api/acopios/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const { Fecha, id_cliente, id_chofer, id_camion, Cantidad, Estado } = req.body;
-        await sequelize.query('CALL EditarAcopio(:id, :Fecha, :id_cliente, :id_chofer, :id_camion, :Cantidad, :Estado)', {
-            replacements: { id, Fecha, id_cliente, id_chofer, id_camion, Cantidad, Estado }
+        const { Fecha, id_cliente, id_chofer, id_camion, Cantidad, ubicacion_acopio,Estado,latitud,longitud,codigo_postal } = req.body;
+        await sequelize.query('CALL EditarAcopio(:id, :Fecha, :id_cliente, :id_chofer, :id_camion, :Cantidad, :ubicacion_acopio, :Estado,:latitud,:longitud,:codigo_postal)', {
+            replacements: { id, Fecha, id_cliente, id_chofer, id_camion, Cantidad,ubicacion_acopio, Estado,latitud,longitud,codigo_postal }
         });
         res.json({ mensaje: 'Acopio actualizado exitosamente' });
     } catch (error) {
@@ -280,7 +285,6 @@ app.put('/api/acopios/:id', async (req, res) => {
         res.status(500).json({ mensaje: 'Hubo un error al actualizar el acopio' });
     }
 });
-
 
 // Ruta para eliminar un acopio existente
 app.delete('/api/acopios/:id', async (req, res) => {
@@ -295,3 +299,69 @@ app.delete('/api/acopios/:id', async (req, res) => {
         res.status(500).json({ mensaje: 'Hubo un error al eliminar el acopio' });
     }
 });
+// Obtener Estados
+app.get('/api/estados', async (req, res) => {
+    try {
+      const estados = await Estado.findAll({ where: { id_pais } });
+      res.json(estados);
+    } catch (error) {
+      res.status(500).json({ error: 'Error obteniendo los estados' });
+    }
+  });
+  
+  // Obtener Condados por Estado
+  app.get('/api/condados/:codigo_estado', async (req, res) => {
+    const { codigo_estado } = req.params;
+    try {
+      const condados = await Condado.findAll({
+        where: { id_pais, codigo_estado }
+      });
+      res.json(condados);
+    } catch (error) {
+      res.status(500).json({ error: 'Error obteniendo los condados' });
+    }
+  });
+  
+  // Obtener Ciudades por Condado
+  app.get('/api/ciudades/:codigo_estado/:codigo_condado', async (req, res) => {
+    const { codigo_estado, codigo_condado } = req.params;
+    try {
+      const ciudades = await Ciudad.findAll({
+        where: { id_pais, codigo_estado, codigo_condado }
+      });
+      res.json(ciudades);
+    } catch (error) {
+      res.status(500).json({ error: 'Error obteniendo las ciudades' });
+    }
+  });
+  // Búsqueda en Tiempo Real de Códigos Postales
+  app.get('/api/codigos-postales', async (req, res) => {
+    const { search } = req.query;
+    try {
+      const codigos = await Ciudad.findAll({
+        where: {
+          id_pais,
+          codigo_postal: {
+            [Op.like]: `${search}%`
+          }
+        },
+        attributes: ['codigo_postal']
+      });
+      res.json(codigos);
+    } catch (error) {
+      res.status(500).json({ error: 'Error obteniendo los códigos postales' });
+    }
+  });
+  app.get('/api/coordenadas/:codigo_postal', async (req, res) => {
+    const { codigo_postal } = req.params;
+    try {
+      const coordenada = coordenadas[codigo_postal];
+      if (coordenada) {
+        res.json(coordenada);
+      } else {
+        res.status(404).json({ error: 'Código postal no encontrado' });
+      }
+    } catch (error) {
+      res.status(500).json({ error: 'Error obteniendo las coordenadas' });
+    }
+  });

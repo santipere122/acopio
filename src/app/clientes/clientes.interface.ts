@@ -16,5 +16,4 @@ export interface Cliente {
     Fecha_creacion:Date | null;
     Fecha_modificacion:Date | null;
     Estado:number;
-    
 }

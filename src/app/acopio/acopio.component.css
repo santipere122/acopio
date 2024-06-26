@@ -54,12 +54,12 @@ table {
     background-color: #c9302c;
   }
   .formulario-container {
-    background-color: #ffffff; /* Fondo blanco */
+    background-color: #ffffff; 
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1); /* Sombra suave */
-    width: 400px; /* Ancho del formulario */
-    margin: 0 auto; /* Centrar horizontalmente */
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1); 
+    width: 100%;    
+    margin: 0 auto;   
   }
   
   .formulario {
@@ -93,32 +93,32 @@ table {
   }
   
   .btn-actualizar {
-    background-color: #007bff; /* Azul */
+    background-color: #007bff; 
     color: white;
     padding: 10px 20px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     margin-right: 10px;
-    transition: background-color 0.3s ease; /* Transición suave */
+    transition: background-color 0.3s ease; 
   }
   
   .btn-actualizar:hover {
-    background-color: #0056b3; /* Azul más oscuro */
+    background-color: #0056b3; 
   }
   
   .btn-cancelar {
-    background-color: #dc3545; /* Rojo */
+    background-color: #dc3545;
     color: white;
     padding: 10px 20px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    transition: background-color 0.3s ease; /* Transición suave */
+    transition: background-color 0.3s ease; 
   }
   
   .btn-cancelar:hover {
-    background-color: #c9302c; /* Rojo más oscuro */
+    background-color: #c9302c; 
   }
   
  h2{
@@ -128,4 +128,54 @@ table {
   color: rgb(0, 0, 0);;
 
  }
-  
+ .container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.left-panel {
+  flex: 1;
+  padding: 10px;
+}
+
+.right-panel {
+  flex: 1;
+  padding: 10px;
+}
+.sugerencias {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  max-height: 100px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  background-color: #fff;
+}
+
+.sugerencias li {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.sugerencias li:hover {
+  background-color: #f0f0f0;
+}
+.boton-actualizar {
+  background-color: #007bff; 
+  color: #fff; /* Color del texto del botón */
+  border: none; /* Quita el borde del botón */
+  padding: 8px 16px; /* Ajusta el padding para hacerlo alargado */
+  border-radius: 4px; /* Borde redondeado */
+  cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
+}
+
+.boton-actualizar:hover {
+  background-color: #0056b3; /* Cambia el color de fondo al pasar el cursor */
+}
+
+.boton-actualizar:disabled {
+  background-color: #d9d9d9; /* Color de fondo cuando el botón está deshabilitado */
+  color: #666666; /* Color del texto cuando el botón está deshabilitado */
+  cursor: not-allowed; /* Cambia el cursor cuando el botón está deshabilitado */
+}
