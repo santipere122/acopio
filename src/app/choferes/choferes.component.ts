@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Chofer } from './choferes.interface';
 import { ChoferesService } from '../choferes.service';
 import { Router } from '@angular/router';
+import { CamionesService } from '../camiones.service';
 
 @Component({
   selector: 'app-choferes',
@@ -12,13 +13,18 @@ export class ChoferesComponent implements OnInit {
   mostrarFormulario = false;
   modoEdicion = false;
   choferes: Chofer[] = [];
+  camiones: any[] = [];
   choferSeleccionado: Chofer | null = null;
   nuevoChofer: Chofer = this.initNuevoChofer();
 
-  constructor(private choferesService: ChoferesService, private router: Router) { }
+  constructor(private choferesService: ChoferesService,
+    private camionesService: CamionesService
+    , private router: Router) { }
 
   ngOnInit(): void {
     this.obtenerChoferes();
+    this.cargarCamiones();
+
   }
 
   toggleFormulario() {
@@ -98,6 +104,7 @@ export class ChoferesComponent implements OnInit {
   private initNuevoChofer(): Chofer {
     return {
       id_chofer: 0,
+      id_camion: 0,
       Nombre: '',
       Dni: '',
       Region: '',
@@ -109,4 +116,19 @@ export class ChoferesComponent implements OnInit {
       Estado: 0
     };
   }
+  obtenerIdentificadorCamion(id_camion: number): string {
+    const camion = this.camiones.find(c => c.id_camion === id_camion);
+    return camion ? camion.Identificador : 'Sin asignar';
+  }
+  cargarCamiones(): void {
+    this.camionesService.obtenerCamiones().subscribe(
+      (data) => {
+        this.camiones = data;
+      },
+      (error) => {
+        console.error('Error al obtener camiones', error);
+      }
+    );
+  }
+
 }

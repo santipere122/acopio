@@ -6,4 +6,5 @@ export interface Camion {
     Modelo:string;
     Fecha_creacion:Date | null;
     Fecha_modificacion:Date | null;
+    Notas:string;
 }

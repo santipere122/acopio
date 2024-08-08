@@ -6,6 +6,7 @@
         <th>DNI</th>
         <th>REGION</th>
         <th>CODIGO POSTAL</th>
+        <th>CAMION DESIGNADO</th>
         <th>DIRECCION</th>
         <th>TELEFONO</th>
         <th>ESTADO</th>
@@ -16,6 +17,7 @@
         <td>{{ chofer.Dni }}</td>
         <td>{{ chofer.Region }}</td>
         <td>{{ chofer.Codigo_postal }}</td>
+        <td>{{ obtenerIdentificadorCamion(chofer.id_camion) }}</td>
         <td>{{ chofer.Direccion }}</td>
         <td>{{ chofer.Telefono }}</td>
         <td>{{ chofer.Estado }}</td>
@@ -56,6 +58,10 @@
       <label for="estado">Estado:</label>
       <input type="number" id="estado" name="estado" [(ngModel)]="nuevoChofer.Estado" required>
       <br>
+      <label for="id_camion">Camión:</label>
+      <select id="id_camion" [(ngModel)]="nuevoChofer.id_camion" name="id_camion" required>
+        <option *ngFor="let camion of camiones" [value]="camion.id_camion">{{ camion.Identificador }}</option>
+      </select>
   
       <button type="submit"  class="btn-actualizar">{{ modoEdicion ? 'Actualizar Chofer' : 'Crear Chofer' }}</button>
       <button type="button" (click)="cerrarFormulario()" class="btn-cancelar" >Cerrar</button>

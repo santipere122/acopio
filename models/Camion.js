@@ -1,5 +1,6 @@
-const { DataTypes, TableHints } = require('sequelize');
+const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db.js');
+
 const Camion = sequelize.define('camion', {
     id_camion: {
         type: DataTypes.INTEGER,
@@ -25,10 +26,12 @@ const Camion = sequelize.define('camion', {
     Fecha_modificacion:{
         type:DataTypes.DATE,
     },
+    Notas:{
+        type: DataTypes.STRING(45),
+    }
 }, {
     tableName: 'camion',
     timestamps: false, 
-
 });
 
 module.exports = Camion;

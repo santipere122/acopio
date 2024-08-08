@@ -1,0 +1,16 @@
+<h1 mat-dialog-title>Completar Acopio</h1>
+<div mat-dialog-content>
+  <form [formGroup]="completarAcopioForm">
+    <mat-form-field>
+      <mat-label>Monto a Pagar</mat-label>
+      <input matInput formControlName="monto_pagar" />
+      <mat-error *ngIf="completarAcopioForm.get('monto_pagar')?.invalid">
+        El monto a pagar es requerido.
+      </mat-error>
+    </mat-form-field>
+  </form>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">Cancelar</button>
+  <button mat-button (click)="completarAcopio()" [disabled]="completarAcopioForm.invalid">Completar</button>
+</div>

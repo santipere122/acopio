@@ -1,4 +1,3 @@
-// models/Usuario.js
 const Sequelize = require('sequelize');
 const sequelize = require('../config/db');
 
@@ -11,6 +10,11 @@ const Usuario = sequelize.define('Usuario', {
     },
     Usuario: Sequelize.STRING,
     Password: Sequelize.STRING,
+    Fecha_Creacion: Sequelize.DATE,
+    Fecha_Modificaion: Sequelize.DATE,
+    Estado: Sequelize.BOOLEAN,
+    id_chofer: Sequelize.INTEGER,
+    Rol: Sequelize.STRING
 }, {
     tableName: 'usuario' 
 });

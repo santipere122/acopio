@@ -25,4 +25,14 @@ export class AcopioService {
   eliminarAcopio(id: number): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/${id}`);
   }
+  inicializarAcopios(fecha: string, chofer: number, camion: number) {
+    const url = `${this.apiUrl}/inicializar`;
+    const body = { fecha, chofer, camion };
+    return this.http.post(url, body);
+  }
+  completarAcopio(id_acopio: number, monto_pagar: string, fecha: string): Observable<any> {
+    const url = `${this.apiUrl}/completar`;
+    const body = { id_acopio, monto_pagar, fecha };
+    return this.http.post<any>(url, body);
+  }
 }

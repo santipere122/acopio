@@ -33,8 +33,12 @@ const Chofer = sequelize.define('chofer', {
     },
     Estado:{
         type:DataTypes.TINYINT,
-    }
-}, {
+    },
+    id_camion: {
+        type: DataTypes.INTEGER,
+    },
+}, 
+{
     tableName: 'chofer',
     timestamps: false, 
 

@@ -104,6 +104,7 @@ export class CamionesComponent implements OnInit {
       Modelo: '',
       Fecha_creacion: new Date(),
       Fecha_modificacion: new Date(),
+      Notas:'',
     };
   }
 }

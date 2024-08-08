@@ -10,10 +10,11 @@ import { ChoferesModule } from './choferes/choferes.module';
 import { CamionesModule } from './camiones/camiones.module';
 import { AcopioModule } from './acopio/acopio.module';
 
+
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, FormsModule, UsuarioModule, LoginModule, ClientesModule, ChoferesModule, CamionesModule, AcopioModule], 
+  imports: [CommonModule,  RouterOutlet, FormsModule, UsuarioModule, LoginModule, ClientesModule, ChoferesModule, CamionesModule, AcopioModule ], 
   templateUrl: './app.component.html', 
   styleUrls: ['./app.component.css']     
 })
@@ -114,6 +115,8 @@ export class AppComponent implements OnInit{
 
   logout(): void {
     this.authService.logout();
+    window.location.reload();
+
   }
 
   navigateToLogin(): void {
@@ -145,6 +148,11 @@ export class AppComponent implements OnInit{
   }
 
   getUsername() {
-    return this.authService.getUsername();
+    return this.authService.getUsername();  
   }
+
+  getRol(){
+    return this.authService.getRole();
+  }
+
 }

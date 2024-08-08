@@ -1,67 +1,77 @@
-const { DataTypes, TableHints } = require('sequelize');
+const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db.js');
-const { combineTableNames } = require('sequelize/lib/utils');
- 
+
 const Cliente = sequelize.define('cliente', {
     id_cliente: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
     },
+   
     Email: {
         type: DataTypes.STRING(30),
     },
     Nombre: {
         type: DataTypes.STRING(60),
     },
-    Dni:{
+    Dni: {
         type: DataTypes.STRING(20),
     },
-    Telefono:{
+    Telefono: {
         type: DataTypes.STRING(30),
     },
-    Codigo_postal:{
-        type:DataTypes.STRING(10),
+    Codigo_postal: {
+        type: DataTypes.STRING(10),
     },
-    Region:{
-        type:DataTypes.STRING(30),
+    Region: {
+        type: DataTypes.STRING(30),
     },
-    Direccion:{
-        type:DataTypes.STRING(60),
+    Direccion: {
+        type: DataTypes.STRING(60),
     },
-    Nombre_contacto:{
-        type:DataTypes.STRING(30),
+    Nombre_contacto: {
+        type: DataTypes.STRING(30),
     },
-    Telefono_contacto:{
-        type:DataTypes.STRING(30),
+    Telefono_contacto: {
+        type: DataTypes.STRING(30),
     },
-    Fecha_ultima_visita:{
-        type:DataTypes.DATE,
+    Fecha_ultima_visita: {
+        type: DataTypes.DATE,
     },
-    Intervalo_de_visita:{
-        type:DataTypes.TINYINT,
+    Intervalo_de_visita: {
+        type: DataTypes.TINYINT,
     },
-    Latitud:{
-        type:DataTypes.DOUBLE,
+    Latitud: {
+        type: DataTypes.DOUBLE,
     },
-    Longitud:{
-        type:DataTypes.DOUBLE,
+    Longitud: {
+        type: DataTypes.DOUBLE,
     },
-    Fecha_creacion:{
-        type:DataTypes.DATE,
+    Fecha_creacion: {
+        type: DataTypes.DATE,
     },
-    Fecha_modificacion:{
-        type:DataTypes.DATE,
+    Fecha_modificacion: {
+        type: DataTypes.DATE,
     },
-    Estado:{
-        type:DataTypes.TINYINT,
-    }
-    
+    Estado: {
+        type: DataTypes.TINYINT,
+    },
+    camion_defecto: {
+        type: DataTypes.STRING(45),
+    },
+    chofer_defecto: {
+        type: DataTypes.STRING(45),
+    },
+    id_camion: {
+        type: DataTypes.INTEGER,
+    },
+    id_chofer: {
+        type: DataTypes.INTEGER,
+    },
+  
 }, {
     tableName: 'cliente',
-    timestamps: false, 
-
+    timestamps: false,
 });
 
 module.exports = Cliente;

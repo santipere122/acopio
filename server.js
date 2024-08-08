@@ -13,20 +13,28 @@ const Condado = require('./models/Condando.js');
 const Ciudad = require('./models/Ciudad.js')
 const VistaAcopio = require('./models/VistaAcopio');
 const { Op } = require('sequelize');
+const cookieParser = require('cookie-parser');
+
 
 const id_pais = 21; // Único id_pais
 
 const app = express();
-app.use(session({
+const sessionConfig = {
     secret: 'your_secret_key',
     resave: false,
     saveUninitialized: true,
-}));
+    cookie: { secure: false },
+    unset: 'destroy' // Configura el evento destroy para limpiar la cookie
+};
+
+app.use(session(sessionConfig));
 
 app.use(cors());
 app.use(express.json());
 const port = 3000;
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(cookieParser());
+
 
 // Configuración de Sequelize: conexión a la base de datos MySQL
 const sequelize = new Sequelize('acopio', 'ilios', '6i5DSRafHD(-X3[L', {
@@ -83,21 +91,23 @@ app.post('/api/clientes/crear', async (req, res) => {
   });
 // Endpoint para actualizar un cliente
 app.put('/api/clientes/:id', async (req, res) => {
-    try {
-        const { id } = req.params;
-        const [updated] = await Cliente.update(req.body, {
-            where: { id_cliente: id }
-        });
-        if (updated) {
-            const updatedCliente = await Cliente.findOne({ where: { id_cliente: id } });
-            res.json(updatedCliente);
-        } else {
-            res.status(404).json({ error: 'Cliente no encontrado' });
-        }
-    } catch (error) {
-        res.status(500).json({ error: 'Error al actualizar el cliente' });
-    }
+  try {
+      const { id } = req.params;
+      const [updated] = await Cliente.update(req.body, {
+          where: { id_cliente: id }
+      });
+      if (updated) {
+          const updatedCliente = await Cliente.findOne({ where: { id_cliente: id } });
+          res.json(updatedCliente);
+      } else {
+          res.status(404).json({ error: 'Cliente no encontrado' });
+      }
+  } catch (error) {
+      console.error('Error al actualizar el cliente:', error);
+      res.status(500).json({ error: 'Error al actualizar el cliente' });
+  }
 });
+
 //Ednpoint para eliminar un cliente
 app.delete('/api/clientes/:id', async (req, res) => {
     try {
@@ -110,40 +120,51 @@ app.delete('/api/clientes/:id', async (req, res) => {
   });
 // Endpoint para inicio de sesión
 app.post('/api/login', async (req, res) => {
-    const { Usuario, Password } = req.body;
+  const { Usuario, Password } = req.body;
 
-    try {
-        // Buscar el usuario en la base de datos por su email
-        const usuario = await sequelize.query('SELECT * FROM usuario WHERE Usuario = ?', {
-            replacements: [Usuario],
-            type: Sequelize.QueryTypes.SELECT
-        });
+  try {
+    const usuario = await sequelize.query(
+      `SELECT u.*, c.id_camion 
+       FROM usuario u
+       LEFT JOIN chofer c ON u.id_chofer = c.id_chofer
+       WHERE u.Usuario = ?`,
+      {
+        replacements: [Usuario],
+        type: Sequelize.QueryTypes.SELECT
+      }
+    );
 
-        // Si no se encontró el usuario, enviar un error
-        if (!usuario || usuario.length === 0) {
-            return res.status(401).json({ error: 'Usuario no encontrado' });
-        }
-
-        // Verificar la contraseña
-        const passwordMatch = (Password === usuario[0].Password);
-
-        if (!passwordMatch) {
-            return res.status(401).json({ error: 'Contraseña incorrecta' });
-        }
-
-        // Generar token de autenticación
-        const token = jwt.sign({ userId: usuario[0].id }, 'secreto', { expiresIn: '1h' });
-
-        // Crear una sesión para el usuario
-        req.session.userId = usuario[0].id;
-
-        // Enviar token como respuesta
-        res.json({ token });
-    } catch (error) {
-        console.error('Error al iniciar sesión:', error);
-        res.status(500).json({ error: 'Error al iniciar sesión' });
+    if (!usuario || usuario.length === 0) {
+      return res.status(401).json({ error: 'Usuario no encontrado' });
     }
+
+    const passwordMatch = (Password === usuario[0].Password);
+
+    if (!passwordMatch) {
+      return res.status(401).json({ error: 'Contraseña incorrecta' });
+    }
+
+    const role = usuario[0].Rol || (usuario[0].id_chofer ? 'chofer' : 'admin');
+    const tokenPayload = {
+      userId: usuario[0].id,
+      username: usuario[0].Usuario,
+      role,
+      id_chofer: usuario[0].id_chofer || null,
+      id_camion: usuario[0].id_camion || null,
+      fechaActual: new Date().toISOString()  // Agregar la fecha actual aquí
+    };
+
+    const token = jwt.sign(tokenPayload, 'secreto', { expiresIn: '1h' });
+
+    req.session.userId = usuario[0].id;
+
+    res.json({ token, fechaActual: tokenPayload.fechaActual }); // Incluir la fecha actual en la respuesta
+  } catch (error) {
+    console.error('Error al iniciar sesión:', error);
+    res.status(500).json({ error: 'Error al iniciar sesión' });
+  }
 });
+
 // END POINT CHOFERES
 //end point mostrar choferes 
 app.get('/api/choferes',(req,res)=>{
@@ -260,9 +281,9 @@ app.get('/api/acopios', (req, res) => {
 // Ruta para crear un nuevo acopio
 app.post('/api/acopios/crear', async (req, res) => {
     try {
-        const { Fecha, id_cliente, id_chofer, id_camion, Cantidad, ubicacion_acopio, Estado,latitud,longitud,codigo_postal} = req.body;
-        await sequelize.query('CALL CrearAcopio(:Fecha, :id_cliente, :id_chofer, :id_camion, :Cantidad, :ubicacion_acopio, :Estado,:latitud,:longitud,:codigo_postal)', {
-            replacements: { Fecha, id_cliente, id_chofer, id_camion, Cantidad,ubicacion_acopio, Estado,latitud,longitud,codigo_postal }
+        const { Fecha, id_cliente, id_chofer, id_camion, Cantidad, direccion, Estado,latitud,longitud,codigo_postal} = req.body;
+        await sequelize.query('CALL CrearAcopio(:Fecha, :id_cliente, :id_chofer, :id_camion, :Cantidad, :direccion, :Estado,:latitud,:longitud,:codigo_postal)', {
+            replacements: { Fecha, id_cliente, id_chofer, id_camion, Cantidad,direccion, Estado,latitud,longitud,codigo_postal }
         });
         res.json({ mensaje: 'Acopio creado exitosamente' });
     } catch (error) {
@@ -275,9 +296,9 @@ app.post('/api/acopios/crear', async (req, res) => {
 app.put('/api/acopios/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const { Fecha, id_cliente, id_chofer, id_camion, Cantidad, ubicacion_acopio,Estado,latitud,longitud,codigo_postal } = req.body;
-        await sequelize.query('CALL EditarAcopio(:id, :Fecha, :id_cliente, :id_chofer, :id_camion, :Cantidad, :ubicacion_acopio, :Estado,:latitud,:longitud,:codigo_postal)', {
-            replacements: { id, Fecha, id_cliente, id_chofer, id_camion, Cantidad,ubicacion_acopio, Estado,latitud,longitud,codigo_postal }
+        const { Fecha, id_cliente, id_chofer, id_camion, Cantidad, direccion,Estado,latitud,longitud,codigo_postal } = req.body;
+        await sequelize.query('CALL EditarAcopio(:id, :Fecha, :id_cliente, :id_chofer, :id_camion, :Cantidad, :direccion, :Estado,:latitud,:longitud,:codigo_postal)', {
+            replacements: { id, Fecha, id_cliente, id_chofer, id_camion, Cantidad,direccion, Estado,latitud,longitud,codigo_postal }
         });
         res.json({ mensaje: 'Acopio actualizado exitosamente' });
     } catch (error) {
@@ -299,6 +320,40 @@ app.delete('/api/acopios/:id', async (req, res) => {
         res.status(500).json({ mensaje: 'Hubo un error al eliminar el acopio' });
     }
 });
+//Inicializar_acopio
+app.post('/api/acopios/inicializar', async (req, res) => {
+  const { fecha, chofer, camion } = req.body;
+  const query = `
+    CALL inicializar_acopios(?, ?, ?);
+  `;
+  try {
+    const results = await sequelize.query(query, {
+      replacements: [fecha, chofer, camion]
+    });
+    res.json({ message: 'Acopios inicializados con éxito', results });
+  } catch (error) {
+    console.error('Error al inicializar acopios:', error);
+    res.status(500).json({ error: 'Error al inicializar acopios' });
+  }
+});
+
+//Completar Acopio
+app.post('/api/acopios/completar', async (req, res) => {
+  const { id_acopio, monto_pagar, fecha } = req.body;
+  const query = `
+    CALL CompletarAcopio(?, ?, ?);
+  `;
+  try {
+    const results = await sequelize.query(query, {
+      replacements: [id_acopio, monto_pagar, fecha]
+    });
+    res.json({ message: 'Acopio completado con éxito', results });
+  } catch (error) {
+    console.error('Error al completar acopio:', error);
+    res.status(500).json({ error: 'Error al completar acopio' });
+  }
+});
+
 // Obtener Estados
 app.get('/api/estados', async (req, res) => {
     try {
@@ -365,3 +420,5 @@ app.get('/api/estados', async (req, res) => {
       res.status(500).json({ error: 'Error obteniendo las coordenadas' });
     }
   });
+
+

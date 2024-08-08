@@ -1,95 +1,141 @@
-<div class="container">
-  <div class="left-panel">
-    <div *ngIf="!mostrarFormulario" class="table-container">
-      <button (click)="toggleFormulario()">Crear Acopio</button>
-      <table>
-        <thead>
-          <tr>
-            <th>Fecha</th>
-            <th>Cliente</th>
-            <th>Chofer</th>
-            <th>Camión</th>
-            <th>Cantidad</th>
-            <th>Estado</th>
-            <th>Latitud</th>
-            <th>Longitud</th>
-            <th>Codigo Postal</th>
-            <th>Direccion Acopio</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let acopio of acopios">
-            <td>{{ acopio.Fecha }}</td>
-            <td>{{ acopio.Cliente_Nombre }}</td>
-            <td>{{ acopio.Chofer_Nombre }}</td>
-            <td>{{ acopio.Camion_Identificador }}</td>
-            <td>{{ acopio.Cantidad }}</td>
-            <td>{{ acopio.Estado }}</td>
-            <td>{{ acopio.latitud }}</td>
-            <td>{{ acopio.longitud }}</td>
-            <td>{{ acopio.codigo_postal }}</td>
-            <td>{{ acopio.ubicacion_acopio }}</td>
-            <td>
-              <button (click)="seleccionarAcopio(acopio)" class="btn-editar">Editar</button>
-              <button (click)="eliminarAcopio(acopio.id_acopio)" class="btn-eliminar">Eliminar</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+  <div class="container">
+    <div class="left-panel">
+      <div *ngIf="!mostrarFormulario" class="table-container">
+        <button  class="btn-editar" mat-raised-button *ngIf="isAdmin()" (click)="toggleFormulario()">Crear Acopio</button>
+        <form *ngIf="isChofer()" [formGroup]="programarAcopioForm" (ngSubmit)="iniciarDia()">
+          <input type="hidden" formControlName="chofer">
+          <label for="camion">Camión:</label>
+          <input type="text" formControlName="camion" id="id_camion" [value]="programarAcopioForm.get('camion')?.value">
+        <button class="btn-editar" mat-raised-button   type="submit" [disabled]="!programarAcopioForm.get('chofer')?.value || !programarAcopioForm.get('camion')?.value" >Iniciar día</button>
+        </form>
 
-    <div *ngIf="mostrarFormulario" class="formulario-container">
-      <h2>{{ modoEdicion ? 'Editar Acopio' : 'Crear Acopio' }}</h2>
-      <form class="formulario" (ngSubmit)="modoEdicion ? actualizarAcopio() : crearAcopio()">
-        <label for="Fecha">Fecha:</label>
-        <input type="date" id="Fecha" [(ngModel)]="nuevoAcopio.Fecha" name="Fecha" required>
-
-        <label for="id_cliente">Cliente:</label>
-        <select id="id_cliente" [(ngModel)]="nuevoAcopio.id_cliente" name="id_cliente" required>
-          <option *ngFor="let cliente of clientes" [value]="cliente.id_cliente">{{ cliente.Nombre }}</option>
-        </select>
-
-        <label for="id_chofer">Chofer:</label>
-        <select id="id_chofer" [(ngModel)]="nuevoAcopio.id_chofer" name="id_chofer" required>
+        <form *ngIf="isAdmin()" [formGroup]="programarAcopioForm" (ngSubmit)="iniciarDia()">
+        <input type="hidden" formControlName="chofer">
+        <label for="chofer">chofer</label>
+        <select formControlName="chofer" id="chfoer">
           <option *ngFor="let chofer of choferes" [value]="chofer.id_chofer">{{ chofer.Nombre }}</option>
         </select>
-
-        <label for="id_camion">Camión:</label>
-        <select id="id_camion" [(ngModel)]="nuevoAcopio.id_camion" name="id_camion" required>
+        <label for="camion">Camión:</label>
+        <select formControlName="camion" id="camion">
           <option *ngFor="let camion of camiones" [value]="camion.id_camion">{{ camion.Identificador }}</option>
         </select>
-
-        <label for="Cantidad">Cantidad:</label>
-        <input type="number" step="0.01" id="Cantidad" [(ngModel)]="nuevoAcopio.Cantidad" name="Cantidad" required>
-
-        <label for="latitud">Latitud:</label>
-        <input type="number" step="0.01" id="latitud" [(ngModel)]="nuevoAcopio.latitud" name="latitud" required>
-
-        <label for="longitud">Longitud:</label>
-        <input type="number" step="0.01" id="longitud" [(ngModel)]="nuevoAcopio.longitud" name="longitud" required>
-        <button type="button" class="btn-direccion">Editar Dirección</button>
-
-        <label for="codigo_postal">Código Postal:</label>
-        <input type="text" id="codigo_postal" [(ngModel)]="nuevoAcopio.codigo_postal" name="codigo_postal" (input)="obtenerSugerenciasCodigoPostal($event)" required>
-        <ul *ngIf="codigosPostales.length > 0" class="sugerencias">
-          <li *ngFor="let codigo of codigosPostales" (click)="seleccionarCodigoPostal(codigo)">{{ codigo }}</li>
-        </ul>
-        <label for="ubicacion_acopio">Ubicación del Acopio:</label>
-        <input type="text" id="ubicacion_acopio" [(ngModel)]="nuevoAcopio.ubicacion_acopio" name="ubicacion_acopio" required>
-        <button type="button" class="boton-actualizar" (click)="actualizarPin()" [disabled]="!nuevoAcopio.ubicacion_acopio">Actualizar Pin</button>
+        <button  class="btn-editar" mat-raised-button type="submit" [disabled]="!programarAcopioForm.get('chofer')?.value || !programarAcopioForm.get('camion')?.value">Iniciar día</button>
+        </form>
         
-
-        <label for="Estado">Estado:</label>
-        <input type="number" id="Estado" [(ngModel)]="nuevoAcopio.Estado" name="Estado" required>
-
-        <button type="submit" class="btn-actualizar">{{ modoEdicion ? 'Actualizar Acopio' : 'Crear Acopio' }}</button>
-        <button type="button" class="btn-cancelar" (click)="cerrarFormulario()">Cerrar</button>
-      </form>
+        <div class="filter-container">
+          <label for="filtroFecha" style="color: black;">Fecha:</label>
+          <input type="date" id="filtroFecha" [(ngModel)]="filtroFecha" name="filtroFecha" [disabled]="isChofer()">
+        
+          <label for="filtroChofer" style="color: black;">Chofer:</label>
+          <select [(ngModel)]="filtroChofer" name="filtroChofer" [disabled]="isChofer()">
+            <option value="">Seleccione un chofer</option>
+            <option *ngFor="let chofer of choferes" [value]="chofer.id_chofer">{{ chofer.Nombre }}</option>
+          </select>
+          <label for="filtroEstado" style="color: black;">Estado:</label>
+          <select [(ngModel)]="filtroEstado" name="filtroEstado" >
+            <option value="">Seleccione un estado</option>
+            <option value="0">Pendiente</option>
+            <option value="1">Realizado</option>
+            <option value="2">Anulado</option>
+          </select>
+        
+          <br>
+          <button type="button" class="btn-editar" (click)="aplicarFiltro()" >Aplicar Filtro</button>
+          <button type="button" class="btn-eliminar" (click)="quitarFiltro()">Quitar Filtro</button>
+          <button type="button" class="btn-eliminar" (click)="downloadPDF()">Descargar PDF</button>
+          <button type="button" class="btn-editar" (click)="Impirmir()">Imprimir</button>
+        </div>
+        <div id="print-section" #printSection>
+          <table class="tabla">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Cliente</th>
+                <th>Chofer</th>
+                <th>Camión</th>
+                <th>Cantidad</th>
+                <th>Estado</th>
+                <th>Codigo Postal</th>
+                <th>Direccion Acopio</th>
+                <th  class="no-print acciones-column">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let acopio of acopiosFiltrados">
+                <td>{{ acopio.Fecha | date:'MM/dd/yy' }}</td>
+                <td>{{ acopio.Cliente_Nombre }}</td>
+                <td>{{ acopio.Chofer_Nombre }}</td>
+                <td>{{ acopio.Camion_Identificador }}</td>
+                <td>{{ acopio.Cantidad }}</td>
+                <td>{{ acopio.EstadoTexto }}</td>
+                <td>{{ acopio.codigo_postal }}</td>
+                <td>{{ acopio.direccion }}</td>
+                <td class="no-print">
+                  <button *ngIf="isAdmin()" (click)="seleccionarAcopio(acopio)" class="btn-editar">Editar</button>
+                  <button *ngIf="isAdmin()" (click)="eliminarAcopio(acopio.id_acopio)" class="btn-eliminar">Eliminar</button>
+                  <button  class="btn-editar" mat-raised-button (click)="mostrarFormularioCompletarAcopio(acopio)">
+                    Completar 
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <iframe id="pdf-viewer" width="100%" height="600px"></iframe>
+      </div>
+     
+      <div *ngIf="mostrarFormulario" class="formulario-container">
+        <h2>{{ modoEdicion ? 'Editar Acopio' : 'Crear Acopio' }}</h2>
+        <form class="formulario" (ngSubmit)="modoEdicion ? actualizarAcopio() : crearAcopio()">
+          <label for="Fecha">Fecha:</label>
+          <input type="date" id="Fecha" [(ngModel)]="nuevoAcopio.Fecha" name="Fecha" required>
+          <label for="id_cliente">Cliente:</label>
+          <select id="id_cliente" [(ngModel)]="nuevoAcopio.id_cliente" name="id_cliente" required>
+            <option *ngFor="let cliente of clientes" [value]="cliente.id_cliente">{{ cliente.Nombre }}</option>
+          </select>
+          <label for="id_chofer">Chofer:</label>
+          <select id="id_chofer" [(ngModel)]="nuevoAcopio.id_chofer" name="id_chofer" required>
+            <option *ngFor="let chofer of choferes" [value]="chofer.id_chofer">{{ chofer.Nombre }}</option>
+          </select>
+          <label for="id_camion">Camión:</label>
+          <select id="id_camion" [(ngModel)]="nuevoAcopio.id_camion" name="id_camion" required>
+            <option *ngFor="let camion of camiones" [value]="camion.id_camion">{{ camion.Identificador }}</option>
+          </select>
+          <label for="Cantidad">Cantidad:</label>
+          <input type="number" step="0.01" id="Cantidad" [(ngModel)]="nuevoAcopio.Cantidad" name="Cantidad" required>
+          <label for="latitud">Latitud:</label>
+          <input type="number" step="0.01" id="latitud" [(ngModel)]="nuevoAcopio.latitud" name="latitud" required>
+          <label for="longitud">Longitud:</label>
+          <input type="number" step="0.01" id="longitud" [(ngModel)]="nuevoAcopio.longitud" name="longitud" required>
+          <label for="codigo_postal">Código Postal:</label>
+          <input type="text" id="codigo_postal" [(ngModel)]="nuevoAcopio.codigo_postal" name="codigo_postal" (input)="obtenerSugerenciasCodigoPostal($event)" required>
+          <ul *ngIf="codigosPostales.length > 0" class="sugerencias">
+            <li *ngFor="let codigo of codigosPostales" (click)="seleccionarCodigoPostal(codigo)">{{ codigo }}</li>
+          </ul>
+          <label for="direccion">Direccion del Acopio:</label>
+          <input type="text" id="direccion" [(ngModel)]="nuevoAcopio.direccion" name="direccion" (blur)="actualizarPin()" required>
+          <label for="Estado">Estado:</label>
+          <input type="number" id="Estado" [(ngModel)]="nuevoAcopio.Estado" name="Estado" required>
+          <button type="submit" class="btn-editar">{{ modoEdicion ? 'Actualizar Acopio' : 'Crear Acopio' }}</button>
+          <button type="button" class="btn-eliminar" (click)="cerrarFormulario()">Cerrar</button>
+        </form>
+      </div>
+    </div>
+    <div class="right-panel">
+      <div id="map" style="width: 600px; height: 100%;"></div>
     </div>
   </div>
+  <div *ngIf="acopiosFiltrados.length === 0" class="mensaje-error">
+    No se encontraron acopios en la fecha seleccionada.
+  </div>
 
-  <div class="right-panel">
-    <div id="map" style="width: 600px; height: 100%;"></div>
+<div class="modal-overlay" *ngIf="mostrarFormularioCompletar">
+  <div class="modal-content">
+    <form [formGroup]="completarAcopioForm" (ngSubmit)="completarAcopio()">
+      <label for="monto_pagar" class="label-negrita" >Monto a Pagar:</label>
+      <input id="monto_pagar" formControlName="monto_pagar" type="number" />
+      <button type="submit" class="btn-editar" [disabled]="completarAcopioForm.invalid">Completar</button>
+      <button type="button" class="btn-eliminar" (click)="cerrarModal()">Cerrar</button>
+    </form>
   </div>
 </div>

@@ -1,5 +1,6 @@
 export interface Chofer {
     id_chofer:number;
+    id_camion:number;
     Nombre: string;
     Dni:string;
     Region:string;

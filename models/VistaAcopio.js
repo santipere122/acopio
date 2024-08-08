@@ -18,7 +18,7 @@ const VistaAcopio = sequelize.define('vista_acopio', {
     Cliente_Region: {
         type: DataTypes.STRING,
     },
-    Cliente_Direccion: {
+    Cliente_direccion: {
         type: DataTypes.STRING,
     },
     Cliente_Telefono: {
@@ -33,7 +33,7 @@ const VistaAcopio = sequelize.define('vista_acopio', {
     Chofer_Region: {
         type: DataTypes.STRING,
     },
-    Chofer_Direccion: {
+    Chofer_direccion: {
         type: DataTypes.STRING,
     },
     Chofer_Telefono: {
@@ -54,7 +54,7 @@ const VistaAcopio = sequelize.define('vista_acopio', {
     Cantidad: {
         type: DataTypes.FLOAT,
     },
-    ubicacion_acopio:{
+    direccion:{
         type: DataTypes.STRING,
 
     },
@@ -69,6 +69,9 @@ const VistaAcopio = sequelize.define('vista_acopio', {
     },
     codigo_postal:{
         type:DataTypes.STRING,
+    },
+    Monto_Pagar:{
+        type: DataTypes.STRING(45),
     }
  
 }, {
