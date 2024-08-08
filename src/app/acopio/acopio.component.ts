@@ -89,7 +89,7 @@ export class AcopioComponent implements OnInit, AfterViewInit, AfterViewChecked 
     if (idChofer !== null && +idChofer >= 0) {
       this.filtroChofer = idChofer.toString();
     } else {
-      this.filtroChofer = null;  // O podría ser '', dependiendo de cómo manejes los valores nulos
+      this.filtroChofer = null;  
     }
   
     this.aplicarFiltro();
@@ -498,9 +498,18 @@ export class AcopioComponent implements OnInit, AfterViewInit, AfterViewChecked 
   }
   
   quitarFiltro() {
-    this.filtroFecha = null;
-    this.filtroChofer = null;
-    this.aplicarFiltro(); 
+    const idChoferstr = this.authservice.getIdChofer();
+    const idChofer = idChoferstr !== null ? +idChoferstr : -1;
+  
+    if (idChofer > 0) {
+      this.filtroEstado = null;
+    } else {
+      this.filtroFecha = null;
+      this.filtroChofer = null;
+      this.filtroEstado = null;
+    }
+  
+    this.aplicarFiltro();
   }
   iniciarDia() {
     const chofer = this.programarAcopioForm.get('chofer')?.value;
