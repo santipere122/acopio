@@ -19,5 +19,7 @@ export interface Acopio {
     Cantidad: number;
     Estado: number;
     monto_pagar:string;
+    latitud: number; 
+  longitud: number; 
   }
   

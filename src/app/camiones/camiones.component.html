@@ -1,5 +1,5 @@
 <div *ngIf="!mostrarFormulario">
-  <button (click)="toggleFormulario()">Crear Camión</button>
+  <button mat-raised-button class="btn-crear " (click)="toggleFormulario()">Crear Camión</button>
   <table>
     <tr>
       <th>IDENTIFICADOR</th>
@@ -14,8 +14,8 @@
       <td>{{ camion.Marca }}</td>
       <td>{{ camion.Modelo }}</td>
       <td>
-        <button (click)="seleccionarCamion(camion)" class="btn-editar" >Editar</button>
-        <button (click)="eliminarCamion(camion.id_camion)"class="btn-eliminar">Eliminar</button>
+        <button mat-raised-button (click)="seleccionarCamion(camion)" class="btn-editar" >Editar</button>
+        <button mat-raised-button (click)="eliminarCamion(camion.id_camion)"class="btn-eliminar">Eliminar</button>
       </td>
     </tr>
   </table>
@@ -39,7 +39,7 @@
     <input type="text" id="modelo" name="modelo" [(ngModel)]="nuevoCamion.Modelo" required>
     <br>
 
-    <button type="submit" class="btn-actualizar">{{ modoEdicion ? 'Actualizar Camión' : 'Crear Camión' }}</button>
-    <button type="button"  class="btn-cancelar" (click)="cerrarFormulario()">Cerrar</button>
+    <button type="submit"  mat-raised-button class="btn-actualizar">{{ modoEdicion ? 'Actualizar Camión' : 'Crear Camión' }}</button>
+    <button type="button" mat-raised-button  class="btn-cancelar" (click)="cerrarFormulario()">Cerrar</button>
   </form>
 </div>

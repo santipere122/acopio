@@ -28,18 +28,19 @@ table {
     background-color: #437226; 
   }
   .btn-editar {
-    background-color: #5bc0de; 
+    background-color: #4cbcde; 
     color: white;
     padding: 8px 16px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    width: 100%;
   }
   
   .btn-editar:hover {
     background-color: #31b0d5; 
   }
-  
+
   .btn-eliminar {
     background-color: #d9534f;
     color: white;
@@ -47,6 +48,7 @@ table {
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    width: 100%;
   }
   
   .btn-eliminar:hover {
@@ -80,32 +82,46 @@ table {
   }
   
   .btn-actualizar {
-    background-color: #007bff; /* Azul */
+    background-color: #007bff; 
     color: white;
     padding: 10px 20px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     margin-right: 10px;
-    transition: background-color 0.3s ease; /* Transición suave */
+    transition: background-color 0.3s ease; 
   }
   
   .btn-actualizar:hover {
-    background-color: #0056b3; /* Azul más oscuro */
+    background-color: #0056b3; 
   }
   
   .btn-cancelar {
-    background-color: #dc3545; /* Rojo */
+    background-color: #dc3545;
     color: white;
     padding: 10px 20px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    transition: background-color 0.3s ease; /* Transición suave */
+    transition: background-color 0.3s ease; 
   }
   
   .btn-cancelar:hover {
-    background-color: #c9302c; /* Rojo más oscuro */
+    background-color: #c9302c; 
+  }
+  
+  .btn-crear {
+    background-color: #27b41d; 
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 50%;
+  }
+  
+  .btn-crear {
+    background-color: #27b41d;
   }
   
  

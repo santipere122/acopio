@@ -9,6 +9,6 @@ export interface Chofer {
     Telefono: string;
     Fecha_creacion:Date | null;
     Fecha_modificacion:Date | null;
-    Estado:number;
+    Estado: 0 | 1;
     
 }

@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient,HttpErrorResponse  } from '@angular/common/http';
-import { catchError, throwError } from 'rxjs';
-import { map } from 'rxjs/operators';
-
-
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { catchError, throwError, map } from 'rxjs';
+import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -14,13 +12,12 @@ export class AuthService {
   private role: string | null = null;
   private id_chofer: string | null = null;
   private id_camion: string | null = null; 
-  private fechaActual: string | null = null;  
-
+  private fechaActual: string | null = null;
 
   constructor(private http: HttpClient) {}
 
   login(credentials: { Usuario: string, Password: string }) {
-    return this.http.post<any>('http://localhost:3000/api/login', credentials)
+    return this.http.post<any>(`${environment.apiUrl}/login`, credentials)
       .pipe(
         map(response => {
           if (response && response.token) {
@@ -63,20 +60,20 @@ export class AuthService {
     }
     return this.role;
   }
-  getIdChofer(){
-    if(!this.id_chofer){
-      this.id_chofer = localStorage.getItem('id_chofer')
+
+  getIdChofer() {
+    if (!this.id_chofer) {
+      this.id_chofer = localStorage.getItem('id_chofer');
     }
     return this.id_chofer;
   }
 
-  getIdCamion(){
-    if(!this.id_camion){
+  getIdCamion() {
+    if (!this.id_camion) {
       this.id_camion = localStorage.getItem('id_camion');
     }
     return this.id_camion;
   }
-  
 
   getFechaActual() {
     if (!this.fechaActual) {
@@ -89,7 +86,7 @@ export class AuthService {
     return this.getRole() === 'admin';
   }
 
-  isChofer(){
+  isChofer() {
     return this.getRole() === 'chofer';
   }
 
@@ -99,10 +96,9 @@ export class AuthService {
     localStorage.removeItem('role');
     localStorage.removeItem('id_chofer');
     localStorage.removeItem('id_camion');
-    localStorage.removeItem('FechaActual');
+    localStorage.removeItem('fechaActual');
     this.loggedIn = false;
     this.username = null;
     this.role = null;
   }
-
 }

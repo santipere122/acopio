@@ -15,7 +15,7 @@ export interface Cliente {
     Longitud: number;
     Fecha_creacion: Date | null;
     Fecha_modificacion: Date | null;
-    Estado: number;
+    Estado: 0 | 1; 
     camion_defecto: string;
     chofer_defecto: string;
     id_camion: number;

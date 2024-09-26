@@ -48,6 +48,11 @@ export class AcopioComponent implements OnInit, AfterViewInit, AfterViewChecked 
   filtroEstado:string | null=null;
   mostrarFormularioCompletar: boolean = false;
   completarAcopioForm: FormGroup;
+  displayedColumns: string[] = [
+    'Fecha', 'Cliente', 'Chofer', 'Camión', 'Cantidad', 'Estado', 'Codigo Postal', 'Direccion Acopio', 'Acciones'
+  ];
+
+  
 
 
   constructor(
@@ -224,7 +229,6 @@ export class AcopioComponent implements OnInit, AfterViewInit, AfterViewChecked 
         }));
         this.filtrarPorFechaYChofer();
         if (!this.modoEdicion) {
-          this.actualizarPines();
         }
       },
       error => console.error('Error al obtener acopios:', error)
@@ -280,13 +284,13 @@ export class AcopioComponent implements OnInit, AfterViewInit, AfterViewChecked 
     this.nuevoAcopio.id_camion = acopio.camion_id_camion;
     this.nuevoAcopio.direccion = acopio.direccion;
     this.mostrarFormulario = true;
-
+  
     setTimeout(() => {
       if (!this.mapInitialized) {
         this.initMap();
       } else {
         google.maps.event.trigger(this.map, 'resize');
-        this.actualizarPines();
+        this.actualizarPines(); 
       }
     }, 0);
   }
@@ -304,6 +308,7 @@ export class AcopioComponent implements OnInit, AfterViewInit, AfterViewChecked 
     this.mostrarFormulario = false;
     this.actualizarPines();
   }
+  
 
   toggleFormulario() {
     this.mostrarFormulario = !this.mostrarFormulario;
@@ -342,34 +347,67 @@ export class AcopioComponent implements OnInit, AfterViewInit, AfterViewChecked 
     );
   }
 
+  
+  actualizarPines(): void {
+    console.log('Actualizando pines. Modo Edicion:', this.modoEdicion);
+    
+    // Limpiar pines solo si hay pines en el mapa
+    if (this.markers.length > 0) {
+      console.log('Limpiando todos los pines. Cantidad actual de pines:', this.markers.length);
+      this.clearPins();
+    }
+  
+    if (this.modoEdicion && this.acopioSeleccionado) {
+      // Solo mostrar el pin del acopio seleccionado
+      console.log('Agregando pin para el acopio seleccionado:', this.acopioSeleccionado);
+      this.agregarPin(this.acopioSeleccionado);
+    } else if (this.acopiosFiltrados && this.acopiosFiltrados.length > 0) {
+      // Agregar pines para todos los acopios filtrados
+      console.log('Agregando pines para todos los acopios:', this.acopiosFiltrados);
+      this.acopiosFiltrados.forEach(acopio => {
+        this.agregarPin(acopio); // Método para agregar pin por acopio
+      });
+    } else {
+      console.log('No hay acopios para mostrar. No se agregarán pines.');
+    }
+  }
+  
+  clearPins(): void {
+    console.log('Limpiando todos los pines. Cantidad actual de pines:', this.markers.length);
+    this.markers.forEach(marker => {
+      console.log('Removiendo el marcador:', marker);
+      marker.setMap(null);
+    });
+    this.markers = [];
+  }
+  
   agregarPin(acopio: any) {
+    if (!acopio) {
+      console.log('No hay acopio disponible para agregar pin.');
+      return; 
+    }
+  
+    console.log('Agregando pin para el acopio:', acopio);
+  
     this.obtenerCoordenadas(acopio.codigo_postal, acopio.direccion).subscribe(
       coordenadas => {
+        console.log('Coordenadas obtenidas:', coordenadas);
         const marker = new google.maps.Marker({
           position: coordenadas,
           map: this.map,
-          title: `Acopio ${acopio.Cliente_Nombre},${acopio.EstadoTexto},a cargo de ${acopio.Chofer_Nombre}`  ,
+          title: `Acopio ${acopio.Cliente_Nombre},${acopio.EstadoTexto},a cargo de ${acopio.Chofer_Nombre}`,
           icon: {
             url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
           },
         });
         this.markers.push(marker);
       },
+      error => {
+        console.error('Error al obtener coordenadas:', error);
+      }
     );
   }
-  actualizarPines() {
-    this.markers.forEach(marker => marker.setMap(null));
-    this.markers = [];
   
-    if (this.modoEdicion && this.acopioSeleccionado) {
-      this.agregarPin(this.acopioSeleccionado);
-    } else if (this.filtroFecha && this.acopiosFiltrados.length > 0) {
-      this.acopiosFiltrados.forEach(acopio => this.agregarPin(acopio));
-    } else {
-      this.acopios.forEach(acopio => this.agregarPin(acopio));
-    }
-  }
-
   obtenerSugerenciasCodigoPostal(event: any) {
     const input = event.target.value;
     if (input.length > 2) {
@@ -480,7 +518,7 @@ export class AcopioComponent implements OnInit, AfterViewInit, AfterViewChecked 
   
     this.acopiosFiltrados = this.acopios.filter(acopio => {
       const fechaCumple = !this.filtroFecha || acopio.Fecha === this.filtroFecha;
-      const choferCumple = idChofer < 0 || this.filtroChofer === null || this.filtroChofer === '' || acopio.chofer_id_chofer === parseInt(this.filtroChofer, 10);
+      const choferCumple = idChofer < 0 || this.filtroChofer === null || acopio.chofer_id_chofer === parseInt(this.filtroChofer, 10);
       const estadoNumCumple = !this.filtroEstado || this.filtroEstado === '' || acopio.Estado === parseInt(this.filtroEstado, 10);
   
       return fechaCumple && choferCumple && estadoNumCumple;
@@ -488,13 +526,13 @@ export class AcopioComponent implements OnInit, AfterViewInit, AfterViewChecked 
   
     this.actualizarPines();
   }
-  
+
   aplicarFiltro() {
     this.filtrarPorFechaYChofer();
     this.actualizarPines();
     if (this.acopiosFiltrados.length === 0) {
     }
-    this.actualizarPines();
+  
   }
   
   quitarFiltro() {
@@ -564,16 +602,42 @@ export class AcopioComponent implements OnInit, AfterViewInit, AfterViewChecked 
     printSection.style.height = Math.min(printSection.scrollHeight, maxHeight) + 'px';
     doc.html(printSection, options);
   }
+Imprimir() {
+    const printSection = document.getElementById('print-section');
+    const newWin = window.open('', '_blank', 'width=600,height=600');
 
-  Impirmir(): void {
-    const printContents = this.printSection.nativeElement.innerHTML;
-    const originalContents = document.body.innerHTML;
-    document.body.innerHTML = printContents;
-    window.print();
-    document.body.innerHTML = originalContents;
-  }
-
-
+    if (newWin) {
+        newWin.document.write(`
+            <html>
+                <head>
+                    <title>Imprimir Acopios</title>
+                    <style>
+                        @media print {
+                            .no-print {
+                                display: none !important; /* Ocultar elementos con la clase no-print */
+                            }
+                            table {
+                                width: 100%;
+                                border-collapse: collapse;
+                            }
+                            th, td {
+                                border: 1px solid black;
+                                padding: 8px;
+                                text-align: left;
+                            }
+                        }
+                    </style>
+                </head>
+                <body onload="window.print(); window.close();">
+                    <div>${printSection?.innerHTML.replace(/<th mat-header-cell.*?acciones.*?<\/th>/, '').replace(/<td mat-cell.*?acciones.*?<\/td>/g, '')}</div>
+                </body>
+            </html>
+        `);
+        newWin.document.close();
+    } else {
+        console.error('No se pudo abrir la ventana de impresión.');
+    }
+}
   convertirEstado(estado: number): string {
     switch (estado) {
       case 0:

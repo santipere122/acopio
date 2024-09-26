@@ -1,70 +1,110 @@
 <div *ngIf="!mostrarFormulario">
-    <button (click)="toggleFormulario()">Crear Chofer</button> 
-    <table>
-      <tr>
-        <th>NOMBRE</th>
-        <th>DNI</th>
-        <th>REGION</th>
-        <th>CODIGO POSTAL</th>
-        <th>CAMION DESIGNADO</th>
-        <th>DIRECCION</th>
-        <th>TELEFONO</th>
-        <th>ESTADO</th>
-        <th>ACCIONES</th>
-      </tr>
-      <tr *ngFor="let chofer of choferes">
-        <td>{{ chofer.Nombre }}</td>
-        <td>{{ chofer.Dni }}</td>
-        <td>{{ chofer.Region }}</td>
-        <td>{{ chofer.Codigo_postal }}</td>
-        <td>{{ obtenerIdentificadorCamion(chofer.id_camion) }}</td>
-        <td>{{ chofer.Direccion }}</td>
-        <td>{{ chofer.Telefono }}</td>
-        <td>{{ chofer.Estado }}</td>
-        <td>
-          <button (click)="seleccionarChofer(chofer)" class="btn-editar">Editar</button>
-          <button (click)="eliminarChofer(chofer.id_chofer)" class="btn-eliminar">Eliminar</button>
-        </td>
-      </tr>
-    </table>
-  </div>
+  <button mat-raised-button class="btn-crear" (click)="toggleFormulario()">Crear Chofer</button>
+  <table mat-table [dataSource]="choferes" class="mat-elevation-z8" matSort>
+
+    <ng-container matColumnDef="Nombre">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</th>
+      <td mat-cell *matCellDef="let chofer">{{ chofer.Nombre }}</td>
+    </ng-container>
   
-  <div *ngIf="mostrarFormulario" class="formulario-container">
-    <form class="formulario" (submit)="modoEdicion ? actualizarChofer() : crearChofer()">
-      <label for="nombre">Nombre:</label>
-      <input type="text" id="nombre" name="nombre" [(ngModel)]="nuevoChofer.Nombre" required>
-      <br>
+    <ng-container matColumnDef="Dni">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>DNI</th>
+      <td mat-cell *matCellDef="let chofer">{{ chofer.Dni }}</td>
+    </ng-container>
   
-      <label for="dni">DNI:</label>
-      <input type="text" id="dni" name="dni" [(ngModel)]="nuevoChofer.Dni" required>
-      <br>
+    <ng-container matColumnDef="Region">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Región</th>
+      <td mat-cell *matCellDef="let chofer">{{ chofer.Region }}</td>
+    </ng-container>
   
-      <label for="region">Región:</label>
-      <input type="text" id="region" name="region" [(ngModel)]="nuevoChofer.Region" required>
-      <br>
+    <ng-container matColumnDef="Codigo_postal">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Código Postal</th>
+      <td mat-cell *matCellDef="let chofer">{{ chofer.Codigo_postal }}</td>
+    </ng-container>
   
-      <label for="codigoPostal">Código Postal:</label>
-      <input type="text" id="codigoPostal" name="codigoPostal" [(ngModel)]="nuevoChofer.Codigo_postal" required>
-      <br>
+    <ng-container matColumnDef="Camion">
+      <th mat-header-cell *matHeaderCellDef>Camión Designado</th>
+      <td mat-cell *matCellDef="let chofer">{{ obtenerIdentificadorCamion(chofer.id_camion) }}</td>
+    </ng-container>
   
-      <label for="direccion">Dirección:</label>
-      <input type="text" id="direccion" name="direccion" [(ngModel)]="nuevoChofer.Direccion" required>
-      <br>
+    <ng-container matColumnDef="Estado">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Estado</th>
+      <td mat-cell *matCellDef="let chofer">{{ estadoTexto(chofer.Estado) }}</td>
+    </ng-container>
   
-      <label for="telefono">Teléfono:</label>
-      <input type="tel" id="telefono" name="telefono" [(ngModel)]="nuevoChofer.Telefono" required>
-      <br>
+    <ng-container matColumnDef="Acciones">
+      <th mat-header-cell *matHeaderCellDef>Acciones</th>
+      <td mat-cell *matCellDef="let chofer">
+        <button mat-icon-button color="primary" (click)="seleccionarChofer(chofer)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="eliminarChofer(chofer.id_chofer)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
   
-      <label for="estado">Estado:</label>
-      <input type="number" id="estado" name="estado" [(ngModel)]="nuevoChofer.Estado" required>
-      <br>
-      <label for="id_camion">Camión:</label>
-      <select id="id_camion" [(ngModel)]="nuevoChofer.id_camion" name="id_camion" required>
-        <option *ngFor="let camion of camiones" [value]="camion.id_camion">{{ camion.Identificador }}</option>
-      </select>
-  
-      <button type="submit"  class="btn-actualizar">{{ modoEdicion ? 'Actualizar Chofer' : 'Crear Chofer' }}</button>
-      <button type="button" (click)="cerrarFormulario()" class="btn-cancelar" >Cerrar</button>
-    </form>
-  </div>
-  
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+</div>
+
+<div *ngIf="mostrarFormulario" class="formulario-container">
+  <form class="formulario" (submit)="modoEdicion ? actualizarChofer() : crearChofer()">
+    
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Nombre</mat-label>
+      <input matInput type="text" id="nombre" name="nombre" [(ngModel)]="nuevoChofer.Nombre" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>DNI</mat-label>
+      <input matInput type="text" id="dni" name="dni" [(ngModel)]="nuevoChofer.Dni" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Región</mat-label>
+      <input matInput type="text" id="region" name="region" [(ngModel)]="nuevoChofer.Region" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Código Postal</mat-label>
+      <input matInput type="text" id="codigo_postal" [(ngModel)]="nuevoChofer.Codigo_postal" name="codigo_postal" (input)="obtenerSugerenciasCodigoPostal($event)" required>
+      <mat-list *ngIf="codigosPostales.length > 0">
+        <mat-list-item *ngFor="let codigo of codigosPostales" (click)="seleccionarCodigoPostal(codigo.codigo_postal)">
+          {{ codigo.codigo_postal }}
+        </mat-list-item>
+      </mat-list>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Dirección</mat-label>
+      <input matInput type="text" id="direccion" name="direccion" [(ngModel)]="nuevoChofer.Direccion" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Teléfono</mat-label>
+      <input matInput type="tel" id="telefono" name="telefono" [(ngModel)]="nuevoChofer.Telefono" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Estado</mat-label>
+      <mat-select [(ngModel)]="nuevoChofer.Estado" name="estado" required>
+        <mat-option [value]="1">Activo</mat-option>
+        <mat-option [value]="0">Inactivo</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Camión</mat-label>
+      <mat-select [(ngModel)]="nuevoChofer.id_camion" name="id_camion" required>
+        <mat-option *ngFor="let camion of camiones" [value]="camion.id_camion">{{ camion.Identificador }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <div class="button-container">
+      <button class="btn-actualizar" type="submit" mat-raised-button>{{ modoEdicion ? 'Actualizar Chofer' : 'Crear Chofer' }}</button>
+      <button class="btn-cancelar" type="button" mat-raised-button (click)="cerrarFormulario()">Cerrar</button>
+    </div>
+  </form>
+</div>

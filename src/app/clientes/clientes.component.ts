@@ -32,6 +32,8 @@ export class ClientesComponent implements OnInit, AfterViewInit {
   private mapInitialized = false;
   private markers: any[] = [];
   private currentMarker: any;
+  displayedColumns: string[] = ['Nombre', 'Dni', 'Telefono', 'Codigo_postal', 'Region', 'Direccion', 'Nombre_contacto', 'Telefono_contacto', 'Fecha_ultima_visita', 'Intervalo_de_visita', 'Estado', 'Chofer', 'Camion', 'ACCIONES'];
+
 
 
   constructor(
@@ -232,7 +234,7 @@ export class ClientesComponent implements OnInit, AfterViewInit {
       Longitud: 0,
       Fecha_creacion: new Date(),
       Fecha_modificacion: new Date(),
-      Estado: 0,
+      Estado: 1,
       camion_defecto: '',
       chofer_defecto: '',
       id_camion: 0,
@@ -418,4 +420,8 @@ private actualizarMapa(): void {
     }
   }
 }
+estadoTexto(estado: 0 | 1): string {
+  return estado === 1 ? 'Activo' : 'Inactivo';
+}
+
 }

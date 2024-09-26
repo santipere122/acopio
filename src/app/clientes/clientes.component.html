@@ -1,112 +1,204 @@
-<div *ngIf="!mostrarFormulario">
+<div *ngIf="!mostrarFormulario"> 
   <div>
-  <button *ngIf="isAdmin()" (click)="toggleFormulario()">Crear Cliente</button>
-  <table>
-    <thead>
-      <tr>
-        <th>CLIENTE</th>
-        <th>DNI</th>
-        <th>TELEFONO</th>
-        <th>CODIGO POSTAL</th>
-        <th>REGION</th>
-        <th>DIRECCION</th>
-        <th>NOMBRE DE CONTACTO</th>
-        <th>TELEFONO CONTACTO</th>
-        <th>FECHA DE LA ULTIMA VISITA</th>
-        <th>INTERVALO VISTAS</th>
-        <th>ESTADO</th>
-        <th>CHOFER</th>
-        <th>CAMIÓN</th>
-        <th *ngIf="isAdmin()">ACCIONES</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let cliente of clientes">
-        <td>{{ cliente.Nombre }}</td>
-        <td>{{ cliente.Dni }}</td>
-        <td>{{ cliente.Telefono }}</td>
-        <td>{{cliente.Codigo_postal}}</td>
-        <td>{{ cliente.Region }}</td>
-        <td>{{ cliente.Direccion }}</td>
-        <td>{{ cliente.Nombre_contacto }}</td>
-        <td>{{ cliente.Telefono_contacto }}</td>
-        <td>{{ cliente.Fecha_ultima_visita | date:'MM/dd/yy' }}</td>
-        <td>{{ cliente.Intervalo_de_visita }}</td>
-        <td>{{ cliente.Estado }}</td>
-        <td>{{ obtenerNombreChofer(cliente.id_chofer) }}</td>
-        <td>{{ obtenerIdentificadorCamion(cliente.id_camion) }}</td>
-        <td *ngIf="isAdmin()">
-          <button (click)="seleccionarCliente(cliente)" class="btn-editar">Editar</button>
-          <button (click)="eliminarCliente(cliente.id_cliente)" class="btn-eliminar">Eliminar</button>
+    <button *ngIf="isAdmin()" mat-raised-button class="btn-crear" (click)="toggleFormulario()">Crear Cliente</button>
+    
+    <table mat-table [dataSource]="clientes" class="mat-elevation-z8" matSort>
+      <ng-container matColumnDef="Nombre">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>CLIENTE</th>
+        <td mat-cell *matCellDef="let cliente">{{ cliente.Nombre }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="Dni">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>DNI</th>
+        <td mat-cell *matCellDef="let cliente">{{ cliente.Dni }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="Telefono">
+        <th mat-header-cell *matHeaderCellDef>Teléfono</th>
+        <td mat-cell *matCellDef="let cliente">{{ cliente.Telefono }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="Codigo_postal">
+        <th mat-header-cell *matHeaderCellDef>Código Postal</th>
+        <td mat-cell *matCellDef="let cliente">{{ cliente.Codigo_postal }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="Region">
+        <th mat-header-cell *matHeaderCellDef>Región</th>
+        <td mat-cell *matCellDef="let cliente">{{ cliente.Region }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="Direccion">
+        <th mat-header-cell *matHeaderCellDef>Dirección</th>
+        <td mat-cell *matCellDef="let cliente">{{ cliente.Direccion }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="Nombre_contacto">
+        <th mat-header-cell *matHeaderCellDef>Nombre de Contacto</th>
+        <td mat-cell *matCellDef="let cliente">{{ cliente.Nombre_contacto }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="Telefono_contacto">
+        <th mat-header-cell *matHeaderCellDef>Teléfono Contacto</th>
+        <td mat-cell *matCellDef="let cliente">{{ cliente.Telefono_contacto }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="Fecha_ultima_visita">
+        <th mat-header-cell *matHeaderCellDef>Fecha de la Última Visita</th>
+        <td mat-cell *matCellDef="let cliente">{{ cliente.Fecha_ultima_visita | date:'MM/dd/yy' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="Intervalo_de_visita">
+        <th mat-header-cell *matHeaderCellDef>Intervalo Visitas</th>
+        <td mat-cell *matCellDef="let cliente">{{ cliente.Intervalo_de_visita }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="Estado">
+        <th mat-header-cell *matHeaderCellDef>Estado</th>
+        <td mat-cell *matCellDef="let cliente">{{ estadoTexto(cliente.Estado) }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="Chofer">
+        <th mat-header-cell *matHeaderCellDef>Chofer</th>
+        <td mat-cell *matCellDef="let cliente">{{ obtenerNombreChofer(cliente.id_chofer) }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="Camion">
+        <th mat-header-cell *matHeaderCellDef>Camión</th>
+        <td mat-cell *matCellDef="let cliente">{{ obtenerIdentificadorCamion(cliente.id_camion) }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="ACCIONES" *ngIf="isAdmin()">
+        <th mat-header-cell *matHeaderCellDef>ACCIONES</th>
+        <td mat-cell *matCellDef="let cliente">
+          <button mat-icon-button color="primary" (click)="seleccionarCliente(cliente)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="eliminarCliente(cliente.id_cliente)">
+            <mat-icon>delete</mat-icon>
+          </button>
         </td>
-      </tr>
-    </tbody>
-  </table>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </div>
 </div>
-</div>
+
 <div *ngIf="mostrarFormulario" class="formulario-container">
   <div class="left-panel">
     <form class="formulario" (submit)="modoEdicion ? actualizarCliente() : crearCliente()">
-      <label for="email">Email:</label>
-      <input type="email" id="email" name="email" [(ngModel)]="nuevoCliente.Email" required>
-      
-      <label for="nombre">Nombre:</label>
-      <input type="text" id="nombre" name="nombre" [(ngModel)]="nuevoCliente.Nombre" required>
-      
-      <label for="dni">DNI:</label>
-      <input type="text" id="dni" name="dni" [(ngModel)]="nuevoCliente.Dni" required>
-      
-      <label for="telefono">Teléfono:</label>
-      <input type="tel" id="telefono" name="telefono" [(ngModel)]="nuevoCliente.Telefono" required>
-      
-      <label for="Codigo_postal">Código Postal:</label>
-      <input type="text" id="codigo_postal" [(ngModel)]="nuevoCliente.Codigo_postal" name="codigo_postal" (input)="obtenerSugerenciasCodigoPostal($event)" required>
-      <ul *ngIf="codigosPostales.length > 0" class="sugerencias">
-        <li *ngFor="let codigo of codigosPostales" (click)="seleccionarCodigoPostal(codigo)">{{ codigo }}</li>
-      </ul>
-      
-      <label for="region">Región:</label>
-      <input type="text" id="region" name="region" [(ngModel)]="nuevoCliente.Region" required>
-      
-      <label for="direccion">Dirección:</label>
-      <input type="text" id="direccion" [(ngModel)]="nuevoCliente.Direccion" name="direccion" (blur)="actualizarPin()" required>
-      
-      <label for="nombreContacto">Nombre de Contacto:</label>
-      <input type="text" id="nombreContacto" name="nombreContacto" [(ngModel)]="nuevoCliente.Nombre_contacto" required>
-      
-      <label for="telefonoContacto">Teléfono de Contacto:</label>
-      <input type="tel" id="telefonoContacto" name="telefonoContacto" [(ngModel)]="nuevoCliente.Telefono_contacto" required>
-      
-      <label for="fechaUltimaVisita">Fecha de Última Visita:</label>
-      <input type="date" id="fechaUltimaVisita" name="fechaUltimaVisita" [(ngModel)]="nuevoCliente.Fecha_ultima_visita" required>
-      
-      <label for="intervaloVisitas">Intervalo de Visitas:</label>
-      <input type="number" id="intervaloVisitas" name="intervaloVisitas" [(ngModel)]="nuevoCliente.Intervalo_de_visita" required>
-      
-      <label for="latitud">Latitud:</label>
-      <input type="number" id="latitud" name="latitud" [(ngModel)]="nuevoCliente.Latitud" required>
-      
-      <label for="longitud">Longitud:</label>
-      <input type="number" id="longitud" name="longitud" [(ngModel)]="nuevoCliente.Longitud" required>
-      
-      <label for="id_chofer">Chofer:</label>
-      <select id="id_chofer" [(ngModel)]="nuevoCliente.id_chofer" name="id_chofer" required>
-        <option *ngFor="let chofer of choferes" [value]="chofer.id_chofer">{{ chofer.Nombre }}</option>
-      </select>
-      
-      <label for="id_camion">Camión:</label>
-      <select id="id_camion" [(ngModel)]="nuevoCliente.id_camion" name="id_camion" required>
-        <option *ngFor="let camion of camiones" [value]="camion.id_camion">{{ camion.Identificador }}</option>
-      </select>
-      
-      <label for="estado">Estado:</label>
-      <input type="number" id="estado" name="estado" [(ngModel)]="nuevoCliente.Estado" required>
-      
-      <button type="submit" class="btn-actualizar">{{ modoEdicion ? 'Actualizar Cliente' : 'Crear Cliente' }}</button>
-      <button type="button" (click)="cerrarFormulario()" class="btn-cancelar">Cancelar</button>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" [(ngModel)]="nuevoCliente.Email" name="email" required>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Nombre</mat-label>
+        <input matInput type="text" [(ngModel)]="nuevoCliente.Nombre" name="nombre" required>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>DNI</mat-label>
+        <input matInput type="text" [(ngModel)]="nuevoCliente.Dni" name="dni" required>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Teléfono</mat-label>
+        <input matInput type="tel" [(ngModel)]="nuevoCliente.Telefono" name="telefono" required>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Código Postal</mat-label>
+        <input matInput type="text" [(ngModel)]="nuevoCliente.Codigo_postal" name="codigo_postal" (input)="obtenerSugerenciasCodigoPostal($event)" required>
+        <mat-list *ngIf="codigosPostales.length > 0">
+          <mat-list-item *ngFor="let codigo of codigosPostales" (click)="seleccionarCodigoPostal(codigo)">
+            {{ codigo }}
+          </mat-list-item>
+        </mat-list>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Región</mat-label>
+        <input matInput type="text" [(ngModel)]="nuevoCliente.Region" name="region" required>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Dirección</mat-label>
+        <input matInput type="text" [(ngModel)]="nuevoCliente.Direccion" name="direccion" (blur)="actualizarPin()" required>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Nombre de Contacto</mat-label>
+        <input matInput type="text" [(ngModel)]="nuevoCliente.Nombre_contacto" name="nombreContacto" required>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Teléfono de Contacto</mat-label>
+        <input matInput type="tel" [(ngModel)]="nuevoCliente.Telefono_contacto" name="telefonoContacto" required>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Fecha de Última Visita</mat-label>
+        <input matInput [matDatepicker]="picker" [(ngModel)]="nuevoCliente.Fecha_ultima_visita" name="fechaUltimaVisita" required>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Intervalo de Visitas</mat-label>
+        <input matInput type="number" [(ngModel)]="nuevoCliente.Intervalo_de_visita" name="intervaloVisitas" required>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Latitud</mat-label>
+        <input matInput type="number" [(ngModel)]="nuevoCliente.Latitud" name="latitud" required>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Longitud</mat-label>
+        <input matInput type="number" [(ngModel)]="nuevoCliente.Longitud" name="longitud" required>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Chofer</mat-label>
+        <mat-select [(ngModel)]="nuevoCliente.id_chofer" name="id_chofer" required>
+          <mat-option *ngFor="let chofer of choferes" [value]="chofer.id_chofer">{{ chofer.Nombre }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Camión</mat-label>
+        <mat-select [(ngModel)]="nuevoCliente.id_camion" name="id_camion" required>
+          <mat-option *ngFor="let camion of camiones" [value]="camion.id_camion">{{ camion.Identificador }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Estado</mat-label>
+        <mat-select [(ngModel)]="nuevoCliente.Estado" name="estado" required>
+          <mat-option [value]="1">Activo</mat-option>
+          <mat-option [value]="0">Inactivo</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <div class="button-container">
+        <button type="submit" mat-raised-button class="btn-actualizar">{{ modoEdicion ? 'Actualizar Cliente' : 'Crear Cliente' }}</button>
+        <button type="button" mat-raised-button (click)="cerrarFormulario()" class="btn-cancelar">Cancelar</button>
+      </div>
     </form>
   </div>
   <div class="right-panel">
-    <div id="map" style="height: 500px; width: 100%;"></div>
+    <mat-card class="map-card">
+      <mat-card-header>
+        <mat-card-title>Mapa  de Ubicación</mat-card-title>
+
+      </mat-card-header>
+      <mat-card-content>
+        <div id="map"></div>
+      </mat-card-content>
+    </mat-card>
   </div>
 </div>

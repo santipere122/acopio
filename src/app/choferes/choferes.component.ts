@@ -3,6 +3,7 @@ import { Chofer } from './choferes.interface';
 import { ChoferesService } from '../choferes.service';
 import { Router } from '@angular/router';
 import { CamionesService } from '../camiones.service';
+import { LocationService } from '../location.service';
 
 @Component({
   selector: 'app-choferes',
@@ -14,12 +15,16 @@ export class ChoferesComponent implements OnInit {
   modoEdicion = false;
   choferes: Chofer[] = [];
   camiones: any[] = [];
+  codigosPostales: any[] = [];
   choferSeleccionado: Chofer | null = null;
   nuevoChofer: Chofer = this.initNuevoChofer();
+  displayedColumns: string[] = ['Nombre', 'Dni', 'Region', 'Codigo_postal', 'Camion', 'Estado', 'Acciones'];
+
 
   constructor(private choferesService: ChoferesService,
-    private camionesService: CamionesService
-    , private router: Router) { }
+    private camionesService: CamionesService,
+    private locationService: LocationService,
+    private router: Router) { }
 
   ngOnInit(): void {
     this.obtenerChoferes();
@@ -113,7 +118,7 @@ export class ChoferesComponent implements OnInit {
       Telefono: '',
       Fecha_creacion: new Date(),
       Fecha_modificacion: new Date(),
-      Estado: 0
+      Estado: 1
     };
   }
   obtenerIdentificadorCamion(id_camion: number): string {
@@ -131,4 +136,28 @@ export class ChoferesComponent implements OnInit {
     );
   }
 
+  estadoTexto(estado: 0 | 1): string {
+    return estado === 1 ? 'Activo' : 'Inactivo';
+  }
+  obtenerSugerenciasCodigoPostal(event: any) {
+    const termino = event.target.value;
+
+    if (termino.length >= 3) { 
+      this.locationService.getCodigosPostales(termino).subscribe(
+        (data: string[]) => {
+          this.codigosPostales = data;
+        },
+        error => {
+          console.error('Error al obtener códigos postales:', error);
+        }
+      );
+    } else {
+      this.codigosPostales = [];
+    }
+  }
+
+  seleccionarCodigoPostal(codigoPostal: string) {
+    this.nuevoChofer.Codigo_postal = codigoPostal;
+    this.codigosPostales = [];
+  }
 }
