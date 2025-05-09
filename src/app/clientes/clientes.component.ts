@@ -10,8 +10,18 @@ import { HttpClient } from '@angular/common/http';
 import { map, catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import * as L from 'leaflet';
+import 'leaflet.markercluster';
 
-declare var google: any;
+
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: '/assets/leaflet-images/marker-icon-2x.png',
+  iconUrl:       '/assets/leaflet-images/marker-icon.png',
+  shadowUrl:     '/assets/leaflet-images/marker-shadow.png',
+});
+
 
 @Component({
   selector: 'app-clientes',
@@ -28,10 +38,12 @@ export class ClientesComponent implements OnInit, AfterViewInit {
   clienteSeleccionado: Cliente | null = null;
   nuevoCliente: Cliente = this.initNuevoCliente();
   formulario: FormGroup;
-  private map: any;
+  private map!: L.Map;
   private mapInitialized = false;
-  private markers: any[] = [];
-  private currentMarker: any;
+  private markerCluster: any;
+  private currentMarker: L.Marker | null = null;
+
+
   displayedColumns: string[] = ['Nombre', 'Dni', 'Telefono', 'Codigo_postal', 'Region', 'Direccion', 'Nombre_contacto', 'Telefono_contacto', 'Fecha_ultima_visita', 'Intervalo_de_visita', 'Estado', 'Chofer', 'Camion', 'ACCIONES'];
 
 
@@ -57,7 +69,7 @@ export class ClientesComponent implements OnInit, AfterViewInit {
     this.obtenerClientes();
     this.cargarChoferes();
     this.cargarCamiones();
-  
+
     this.formulario.get('Codigo_postal')?.valueChanges.subscribe(value => {
       this.seleccionarCodigoPostal(value);
     });
@@ -71,31 +83,27 @@ export class ClientesComponent implements OnInit, AfterViewInit {
       }, 0);
     }
   }
-  ngAfterViewInit(): void {
+   ngAfterViewInit(): void {
     if (!this.mapInitialized) {
       setTimeout(() => {
-        if (typeof google !== 'undefined' && google.maps) {
-          this.initMap();
-          this.mapInitialized = true;
-        } else {
-          console.error('Google Maps API no está disponible.');
-        }
+        this.initMap();
+        this.mapInitialized = true;
       }, 0);
     }
   }
   private initMap(): void {
     const mapElement = document.getElementById('map');
-    if (!mapElement) {
-      console.error('Elemento del mapa no encontrado');
-      return;
-    }
-    console.log('Inicializando el mapa...');
-    this.map = new google.maps.Map(mapElement, {
-      center: { lat: 37.0902, lng: -95.7129 },
-      zoom: 3.55
-    });
+    if (!mapElement) return;
+    this.map = L.map(mapElement).setView([37.0902, -95.7129], 4);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(this.map);
+
+    this.markerCluster = L.markerClusterGroup();
+    this.map.addLayer(this.markerCluster);
   }
-  
+
   isAdmin(): boolean {
     return this.authservice.isAdmin();
   }
@@ -103,16 +111,26 @@ export class ClientesComponent implements OnInit, AfterViewInit {
     this.mostrarFormulario = !this.mostrarFormulario;
     this.modoEdicion = false;
     this.nuevoCliente = this.initNuevoCliente();
+
     if (this.mostrarFormulario) {
+      // Cuando abrimos el formulario, inicializamos Leaflet
       setTimeout(() => {
-        this.initMap(); 
+        this.initMap();
         this.actualizarMapa();
       }, 0);
     } else {
-      this.map = null;
+      // Cuando cerramos, removemos el mapa y limpiamos marcadores
+      if (this.map) {
+        this.map.remove();           // destruye la instancia de Leaflet
+        this.mapInitialized = false;
+      }
+      // opcional: limpiar cluster
+      if (this.markerCluster) {
+        this.markerCluster.clearLayers();
+      }
     }
   }
-  
+
   obtenerClientes() {
     this.clientesService.obtenerClientes().subscribe(
       (data: Cliente[]) => {
@@ -251,57 +269,77 @@ export class ClientesComponent implements OnInit, AfterViewInit {
     const camion = this.camiones.find((c) => c.id_camion === id_camion);
     return camion ? camion.Identificador : 'Sin asignar';
   }
-  obtenerCoordenadas(codigoPostal: string, ubicacionAcopio: string) {
-    let direccion = `${ubicacionAcopio}, ${codigoPostal}`.trim();
-      if (!ubicacionAcopio) {
+
+  private obtenerCoordenadas(codigoPostal: string, ubicacion: string) {
+    let direccion = `${ubicacion}, ${codigoPostal}`.trim();
+    if (!ubicacion) {
       direccion = codigoPostal;
     } else if (!codigoPostal) {
-      direccion = ubicacionAcopio;
+      direccion = ubicacion;
     }
-  
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${direccion}&key=AIzaSyBMUMb8fd9CJzaurCfLZe7neoTJzJ_lnsE`;
-  
-    return this.http.get(url).pipe(
-        map((response: any) => {
-        if (response.results && response.results.length > 0) {
-          return response.results[0].geometry.location;
-        } else {
-          throw new Error('No se encontraron resultados de coordenadas');
+
+    const base   = 'https://nominatim.openstreetmap.org/search';
+    const params = [
+      'format=json',
+      'limit=1',
+      `q=${encodeURIComponent(direccion)}`,
+      'countrycodes=us'
+    ].join('&');
+
+    const url = `${base}?${params}`;
+    return this.http.get<any[]>(url).pipe(
+      map(results => {
+        if (!results.length) {
+          throw new Error('No se encontraron resultados de geocodificación');
         }
+        return {
+          lat: parseFloat(results[0].lat),
+          lng: parseFloat(results[0].lon)
+        };
       }),
-        catchError(error => {
-        console.error('Error al obtener las coordenadas:', error);
-        return throwError(error);
+      catchError(err => {
+        console.error('Error al geocodificar con Nominatim', err);
+        return throwError(err);
       })
     );
   }
 
   agregarPin(cliente: any) {
-    this.obtenerCoordenadas(cliente.Codigo_postal, cliente.Direccion).subscribe(
-      coordenadas => {
-        const marker = new google.maps.Marker({
-          position: coordenadas,
-          map: this.map,
-          icon: {
-            url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
-          }
+    const direccion = `${cliente.Direccion}, ${cliente.Codigo_postal}, ${cliente.Region}`;
+    this.geocodificarDireccion(direccion).subscribe(
+      ({ lat, lng }) => {
+        const icon = L.icon({
+          iconUrl: '/assets/leaflet-images/marker-icon.png',
+          iconRetinaUrl: '/assets/leaflet-images/marker-icon-2x.png',
+          shadowUrl: '/assets/leaflet-images/marker-shadow.png',
+          iconSize:    [25, 41],
+          iconAnchor:  [12, 41],
+          popupAnchor: [1, -34],
+          shadowSize:  [41, 41]
         });
-        this.markers.push(marker);
+        const marker = L.marker([lat, lng], { icon })
+          .bindPopup(`<strong>${cliente.Nombre}</strong><br>${cliente.Direccion}`);
+        this.markerCluster.addLayer(marker);
       },
-      error => console.error('Error al obtener las coordenadas:', error)
+      err => console.error('No se pudo geocodificar la dirección:', err)
     );
   }
-  
+
+
+
   actualizarPines() {
-    this.markers.forEach(marker => marker.setMap(null));
-    this.markers = [];
-        if (this.modoEdicion && this.clienteSeleccionado) {
-      this.agregarPin(this.clienteSeleccionado); 
-    } else {
-      this.clientes.forEach(cliente => this.agregarPin(cliente));
-    }
+    if (!this.nuevoCliente.Direccion || !this.nuevoCliente.Codigo_postal) return;
+
+  const direccionCompleta = `${this.nuevoCliente.Direccion}, ${this.nuevoCliente.Codigo_postal}, ${this.nuevoCliente.Region}`;
+
+  this.geocodificarDireccion(direccionCompleta).subscribe((coordenadas: { lat: number; lng: number }) => {
+    this.nuevoCliente.Latitud = coordenadas.lat;
+    this.nuevoCliente.Longitud = coordenadas.lng;
+    this.actualizarMapaFormulario(); // <- esto debería dibujar el pin nuevo
+  });
   }
-  
+
+
   obtenerSugerenciasCodigoPostal(event: any) {
     const input = event.target.value;
     if (input.length > 2) {
@@ -315,113 +353,186 @@ export class ClientesComponent implements OnInit, AfterViewInit {
       this.codigosPostales = [];
     }
   }
-  
+
   seleccionarCodigoPostal(codigoPostal: string) {
     this.nuevoCliente.Codigo_postal = codigoPostal;
     this.codigosPostales = [];
-  
+
     if (!codigoPostal) {
-      this.nuevoCliente.Direccion = ''; 
+      this.nuevoCliente.Direccion = '';
+      // limpiar marcador anterior
       if (this.currentMarker) {
-        this.currentMarker.setMap(null);
+        this.markerCluster.removeLayer(this.currentMarker);
         this.currentMarker = null;
       }
       return;
     }
-  
+
     this.obtenerCoordenadas(codigoPostal, this.nuevoCliente.Direccion).subscribe(
       coordenadas => {
         this.nuevoCliente.Latitud = coordenadas.lat;
         this.nuevoCliente.Longitud = coordenadas.lng;
-  
+
+        // limpiar marcador anterior
         if (this.currentMarker) {
-          this.currentMarker.setMap(null);
+          this.markerCluster.removeLayer(this.currentMarker);
         }
-  
-        this.currentMarker = new google.maps.Marker({
-          position: coordenadas,
-          map: this.map,
-          title: 'Ubicación seleccionada',
-          icon: {
-            url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-          }
-        });
-  
-        this.map.setCenter(coordenadas);
-        this.map.setZoom(15);
+
+        // crear nuevo marcador Leaflet
+        this.currentMarker = L.marker([coordenadas.lat, coordenadas.lng], {
+          icon: L.icon({
+            iconUrl: '/assets/leaflet-images/marker-icon.png',
+            iconRetinaUrl: '/assets/leaflet-images/marker-icon-2x.png',
+            shadowUrl: '/assets/leaflet-images/marker-shadow.png',
+            iconSize:    [25, 41],
+            iconAnchor:  [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize:  [41, 41]
+          })
+        }).bindPopup('Ubicación seleccionada');
+
+        // añadir al cluster
+        this.markerCluster.addLayer(this.currentMarker);
+
+        // centrar y hacer zoom
+        this.map.setView([coordenadas.lat, coordenadas.lng], 15);
       },
       error => console.error('Error al obtener las coordenadas:', error)
     );
-  }  
+  }
+
   actualizarDireccion(Direccion: string) {
     this.nuevoCliente.Direccion = Direccion;
-      if (!Direccion && !this.nuevoCliente.Direccion) {
+    if (!Direccion && !this.nuevoCliente.Codigo_postal) {
       if (this.currentMarker) {
-        this.currentMarker.setMap(null);
+        this.markerCluster.removeLayer(this.currentMarker);
         this.currentMarker = null;
       }
       return;
     }
-      this.actualizarCoordenadas();
+    this.actualizarCoordenadas();
   }
+
   actualizarCoordenadas() {
-    this.obtenerCoordenadas(this.nuevoCliente.Codigo_postal, this.nuevoCliente.Direccion).subscribe(
-      coordenadas => {
-        this.nuevoCliente.Latitud = coordenadas.lat;
-        this.nuevoCliente.Longitud = coordenadas.lng;
-  
-        if (this.currentMarker) {
-          this.currentMarker.setMap(null);
-        }
-  
-        this.currentMarker = new google.maps.Marker({
-          position: coordenadas,
-          map: this.map,
-          title: 'Ubicación seleccionada',
-          icon: {
-            url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-          }
-        });
-  
-        this.map.setCenter(coordenadas);
-        this.map.setZoom(15);
-      },
-      error => console.error('Error al obtener las coordenadas:', error)
-    );
-  }
-  
-  actualizarPin() {
-    if (this.nuevoCliente.Direccion) {
-      this.actualizarCoordenadas();
-    }
+  this.obtenerCoordenadas(this.nuevoCliente.Codigo_postal, this.nuevoCliente.Direccion)
+    .subscribe(coordenadas => {
+      this.nuevoCliente.Latitud = coordenadas.lat;
+      this.nuevoCliente.Longitud = coordenadas.lng;
+
+      if (this.currentMarker) {
+        this.markerCluster.removeLayer(this.currentMarker);
+      }
+
+      this.currentMarker = L.marker([coordenadas.lat, coordenadas.lng], {
+        icon: L.icon({
+          iconUrl: '/assets/leaflet-images/marker-icon.png',
+          iconRetinaUrl: '/assets/leaflet-images/marker-icon-2x.png',
+          shadowUrl: '/assets/leaflet-images/marker-shadow.png',
+          iconSize:    [25, 41],
+          iconAnchor:  [12, 41],
+          popupAnchor: [1, -34],
+          shadowSize:  [41, 41]
+        })
+      }).bindPopup('Ubicación seleccionada');
+
+      this.markerCluster.addLayer(this.currentMarker);
+      this.map.setView([coordenadas.lat, coordenadas.lng], 15);
+    },
+    error => console.error('Error al obtener las coordenadas:', error)
+  );
 }
+
+
+actualizarPin() {
+  if (this.nuevoCliente.Direccion || this.nuevoCliente.Codigo_postal) {
+    this.actualizarCoordenadas();
+  }
+}
+
 private actualizarMapa(): void {
-  if (this.map) {
-    if (this.modoEdicion && this.clienteSeleccionado) {
-      this.map.setCenter({ lat: this.clienteSeleccionado.Latitud, lng: this.clienteSeleccionado.Longitud });
-      this.map.setZoom(15);
-      if (this.currentMarker) {
-        this.currentMarker.setMap(null);
-      }
-      this.currentMarker = new google.maps.Marker({
-        position: { lat: this.clienteSeleccionado.Latitud, lng: this.clienteSeleccionado.Longitud },
-        map: this.map,
-        title: this.clienteSeleccionado.Direccion,
-        icon: {
-          url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
-        }
-      });
-    } else if (this.mostrarFormulario) {
-      this.map.setCenter({ lat: 37.0902, lng: -95.7129 },);
-      this.map.setZoom(3.55);  
-      if (this.currentMarker) {
-        this.currentMarker.setMap(null);
-      }
-    }
+  if (!this.map) return;
+
+  if (this.currentMarker) {
+    this.markerCluster.removeLayer(this.currentMarker);
+    this.currentMarker = null;
+  }
+
+  if (this.modoEdicion && this.clienteSeleccionado) {
+    const { Latitud: lat, Longitud: lng, Direccion } = this.clienteSeleccionado;
+
+    const defaultIcon = L.icon({
+      iconUrl: '/assets/leaflet-images/marker-icon.png',
+      iconRetinaUrl: '/assets/leaflet-images/marker-icon-2x.png',
+      shadowUrl: '/assets/leaflet-images/marker-shadow.png',
+      iconSize:    [25, 41],
+      iconAnchor:  [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize:  [41, 41]
+    });
+
+    this.currentMarker = L.marker([lat, lng], { icon: defaultIcon })
+      .bindPopup(Direccion);
+
+    this.markerCluster.addLayer(this.currentMarker);
+    this.map.setView([lat, lng], 15);
+
+  } else if (this.mostrarFormulario) {
+    this.map.setView([37.0902, -95.7129], 4);
   }
 }
+
+
 estadoTexto(estado: 0 | 1): string {
   return estado === 1 ? 'Activo' : 'Inactivo';
 }
+private actualizarMapaFormulario() {
+  if (!this.nuevoCliente.Direccion || !this.nuevoCliente.Codigo_postal) return;
+  const direccion = `${this.nuevoCliente.Direccion}, ${this.nuevoCliente.Codigo_postal}, ${this.nuevoCliente.Region}`;
+  this.geocodificarDireccion(direccion).subscribe(
+    ({ lat, lng }) => {
+      if (this.currentMarker) {
+        this.markerCluster.removeLayer(this.currentMarker);
+        this.currentMarker = null;
+      }
+      this.currentMarker = L.marker([lat, lng], {
+        icon: L.icon({
+          iconUrl: '/assets/leaflet-images/marker-icon.png',
+          iconRetinaUrl: '/assets/leaflet-images/marker-icon-2x.png',
+          shadowUrl: '/assets/leaflet-images/marker-shadow.png',
+          iconSize:    [25, 41],
+          iconAnchor:  [12, 41],
+          popupAnchor: [1, -34],
+          shadowSize:  [41, 41]
+        })
+      }).bindPopup('Ubicación seleccionada');
+      this.markerCluster.addLayer(this.currentMarker);
+      this.map.setView([lat, lng], 15);
+    },
+    err => console.error('Error al actualizar pin:', err)
+  );
+}
+
+private geocodificarDireccion(direccion: string) {
+  const base   = 'https://nominatim.openstreetmap.org/search';
+  const params = [
+    'format=json',
+    'limit=1',
+    `q=${encodeURIComponent(direccion)}`,
+    'countrycodes=us'
+  ].join('&');
+
+  const url = `${base}?${params}`;
+  return this.http.get<any[]>(url).pipe(
+    map(results => {
+      if (!results.length) throw new Error('No hay resultados de geocodificación');
+      return { lat: +results[0].lat, lng: +results[0].lon };
+    }),
+    catchError(err => {
+      console.error('Error geocodificando con Nominatim:', err);
+      return throwError(err);
+    })
+  );
+}
+
 
 }

@@ -33,21 +33,32 @@
     ],
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              {
+                "glob": "**/*",
+                "input": "node_modules/leaflet/dist/images",
+                "output": "assets/leaflet-images"
+              }
+
             ],
             "styles": [
               "src/custom-theme.scss",
               "src/styles.css",
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "node_modules/leaflet/dist/leaflet.css",
-              "node_modules/@angular/material/prebuilt-themes/indigo-pink.css"
+              "node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
+              "node_modules/leaflet.markercluster/dist/MarkerCluster.css",
+              "node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css"
+
+
 
             ],
             "scripts": [
               "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
-              "node_modules/leaflet/dist/leaflet.js"
+              "node_modules/leaflet/dist/leaflet.js",
+               "node_modules/leaflet.markercluster/dist/leaflet.markercluster.js"
             ]
-           
+
           },
           "configurations": {
             "production": {
@@ -81,6 +92,7 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+                 "options": {"proxyConfig": "proxy.conf.json"},
           "configurations": {
             "production": {
               "buildTarget": "angular0:build:production"

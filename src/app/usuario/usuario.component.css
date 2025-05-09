@@ -1,183 +1,30 @@
-div{
-    max-width: 500px;
-    font-size: 32px;
-    margin: 0 auto;
-}
 .usuario-container {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-  }
-  
-  .usuario-form {
-    margin-top: 20px;
-    padding: 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-  }
-  
-  .form-group {
-    margin-bottom: 15px;
-  }
-  
-  .form-group label {
-    display: block;
-    margin-bottom: 5px;
-  }
-  
-  .form-control {
-    width: 100%;
-    padding: 8px;
-    box-sizing: border-box;
-  }
-  
-  .btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    color: #fff;
-    cursor: pointer;
-  }
-  
-  .btn-primary {
-    background-color: #007bff;
-  }
-  
-  .btn-success {
-    background-color: #28a745;
-  }
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
 
-  .btn-secondary {
-    background-color: #ff0000;
-    border-color: #ff0404;
-  }
-  .password-wrapper {
-    position: relative;
-  }
-  
-  .password-wrapper .form-control {
-    padding-right: 40px; /* Espacio para el ícono */
-  }
-  
-  .password-wrapper .fa {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 20px;
-    cursor: pointer;
-  }
-  table {
-    color: black;
-    background-color: white;
-    border-collapse: collapse;
-  }
-  
-  table th, table td {
-    text-align: center;
-    border: 1px solid black;
-    padding: 8px;
-  }
-  .btn-crear {
-    background-color: #589035;
-    border: none; 
-    color: white; 
-    padding: 15px 32px; 
-    text-align: center;
-    text-decoration: none; 
-    display: inline-block; 
-    font-size: 16px; 
-    margin: 4px 2px; 
-    cursor: pointer; 
-    border-radius: 8px; 
-    transition: background-color 0.3s ease; 
-  }
-  
-  .btn-crear:hover {
-    background-color: #437226; 
-  }
-  .btn-editar {
-    background-color: #4cbcde; 
-    color: white;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    width: 100%;
-  }
-  
-  .btn-editar:hover {
-    background-color: #31b0d5; 
-  }
-  
-  .btn-eliminar {
-    background-color: #ff0800;
-    color: white;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    width: 100%;
+.usuario-form {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  display: flex;
+  flex-direction: column; /* Esto ya asegura que los campos estén uno debajo del otro */
+  gap: 20px; /* Añade espacio entre los campos */
+}
 
-  }
-  
-  .btn-eliminar:hover {
-    background-color: #c9302c;
-  }
-  .formulario-container {
-    background-color: #ffffff; /* Fondo blanco */
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1); /* Sombra suave */
-    width: 400px; /* Ancho del formulario */
-    margin: 0 auto; /* Centrar horizontalmente */
-  }
-  
-  .formulario {
-    text-align: center;
-  }
-  
-  .formulario label {
-    display: block;
-    margin-bottom: 5px;
-    color: #444444; /* Color de texto oscuro */
-  }
-  
-  .formulario input {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  .btn-actualizar {
-    background-color: #007bff; /* Azul */
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-right: 10px;
-    transition: background-color 0.3s ease; /* Transición suave */
-  }
-  
-  .btn-actualizar:hover {
-    background-color: #0056b3; /* Azul más oscuro */
-  }
-  
-  .btn-cancelar {
-    background-color: #dc3545; /* Rojo */
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease; /* Transición suave */
-  }
-  
-  .btn-cancelar:hover {
-    background-color: #c9302c; /* Rojo más oscuro */
-  }
-  
+.mat-form-field {
+  width: 100%; /* Asegura que los campos ocupen todo el ancho disponible */
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.mat-raised-button {
+  box-shadow: none; /* Elimina la sombra predeterminada */
+}

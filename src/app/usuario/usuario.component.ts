@@ -17,7 +17,7 @@ export class UsuarioComponent implements OnInit {
   usuarioEditar: Usuario = { id_Usuario: 0, Usuario: '', Password: '', Fecha_Creacion: '', Fecha_Modificacion: '', Estado: '', id_chofer: null, Rol: '' };
   confirmarPasswordEditar: string = '';
   mostrarPassword: boolean = false;
-
+  displayedColumns: string[] = ['Usuario', 'Rol', 'Acciones'];
   mostrarCrearUsuario = false;
   mostrarEditarUsuario = false;
   usuarioSeleccionado: number | undefined;
@@ -68,18 +68,19 @@ export class UsuarioComponent implements OnInit {
   }
 
   limpiarFormulario() {
-    this.nuevoUsuario = { Usuario: '', Password: '' };
-    this.confirmarPassword = '';
-    this.usuarioEditar = { id_Usuario: 0, Usuario: '', Password: '', Fecha_Creacion: '', Fecha_Modificacion: '', Estado: '', id_chofer: null, Rol: '' };
-    this.confirmarPasswordEditar = '';
-    this.mostrarCrearUsuario = false;
-    this.mostrarEditarUsuario = false;
-    this.usuarioSeleccionado = undefined; 
-  }
+  this.nuevoUsuario = { Usuario: '', Password: '', Rol: 'Admin', id_chofer: null };
+  this.confirmarPassword = '';
+  this.usuarioEditar = { id_Usuario: 0, Usuario: '', Password: '', Fecha_Creacion: '', Fecha_Modificacion: '', Estado: '', id_chofer: null, Rol: '' };
+  this.confirmarPasswordEditar = '';
+  this.mostrarCrearUsuario = false;
+  this.mostrarEditarUsuario = false;
+  this.usuarioSeleccionado = undefined;
+}
 
-  toggleMostrarPassword() {
+  toggleMostrarPassword(event: Event) {
+    event.stopPropagation(); // Asegúrate de detener la propagación
     this.mostrarPassword = !this.mostrarPassword;
-  }
+}
 
   cargarDatosUsuario() {
     if (this.usuarioSeleccionado) {

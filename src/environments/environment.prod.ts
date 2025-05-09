@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://acopio.sytes.net/api'
+  apiUrl: 'http://acopio.zapto.org/api'
 };

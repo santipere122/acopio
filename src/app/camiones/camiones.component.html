@@ -1,45 +1,84 @@
 <div *ngIf="!mostrarFormulario">
-  <button mat-raised-button class="btn-crear " (click)="toggleFormulario()">Crear Camión</button>
-  <table>
-    <tr>
-      <th>IDENTIFICADOR</th>
-      <th>MATRÍCULA</th>
-      <th>MARCA</th>
-      <th>MODELO</th>
-      <th>ACCIONES</th>
-    </tr>
-    <tr *ngFor="let camion of camiones">
-      <td>{{ camion.Identificador }}</td>
-      <td>{{ camion.Matricula }}</td>
-      <td>{{ camion.Marca }}</td>
-      <td>{{ camion.Modelo }}</td>
-      <td>
-        <button mat-raised-button (click)="seleccionarCamion(camion)" class="btn-editar" >Editar</button>
-        <button mat-raised-button (click)="eliminarCamion(camion.id_camion)"class="btn-eliminar">Eliminar</button>
+  <button mat-raised-button color="primary" class="btn-crear" (click)="toggleFormulario()">
+    Crear Camión
+  </button>
+
+  <table mat-table [dataSource]="camiones" class="mat-elevation-z8">
+
+    <!-- Identificador Column -->
+    <ng-container matColumnDef="Identificador">
+      <th mat-header-cell *matHeaderCellDef> IDENTIFICADOR </th>
+      <td mat-cell *matCellDef="let camion"> {{ camion.Identificador }} </td>
+    </ng-container>
+
+    <!-- Matrícula Column -->
+    <ng-container matColumnDef="Matricula">
+      <th mat-header-cell *matHeaderCellDef> MATRÍCULA </th>
+      <td mat-cell *matCellDef="let camion"> {{ camion.Matricula }} </td>
+    </ng-container>
+
+    <!-- Marca Column -->
+    <ng-container matColumnDef="Marca">
+      <th mat-header-cell *matHeaderCellDef> MARCA </th>
+      <td mat-cell *matCellDef="let camion"> {{ camion.Marca }} </td>
+    </ng-container>
+
+    <!-- Modelo Column -->
+    <ng-container matColumnDef="Modelo">
+      <th mat-header-cell *matHeaderCellDef> MODELO </th>
+      <td mat-cell *matCellDef="let camion"> {{ camion.Modelo }} </td>
+    </ng-container>
+
+    <!-- Acciones Column -->
+    <ng-container matColumnDef="Acciones">
+      <th mat-header-cell *matHeaderCellDef> ACCIONES </th>
+      <td mat-cell *matCellDef="let camion">
+        <button  mat-icon-button class="btn-editar"  (click)="seleccionarCamion(camion)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button class="btn-eliminar" (click)="eliminarCamion(camion.id_camion)">
+          <mat-icon>delete</mat-icon>
+
+        </button>
       </td>
-    </tr>
+    </ng-container>
+
+    <!-- Header and Row Declarations -->
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
   </table>
 </div>
 
-<div *ngIf="mostrarFormulario"  class="formulario-container">
-  <form class="formulario" (submit)="modoEdicion ? actualizarCamion() : crearCamion()" >
-    <label for="identificador">Identificador:</label>
-    <input type="text" id="identificador" name="identificador" [(ngModel)]="nuevoCamion.Identificador" required>
-    <br>
+<div *ngIf="mostrarFormulario" class="formulario-container">
+  <form class="formulario" (submit)="modoEdicion ? actualizarCamion() : crearCamion()">
+    <mat-form-field  appearance="outline" class="full-width">
+      <mat-label>Identificador</mat-label>
+      <input matInput type="text" id="identificador" name="identificador" [(ngModel)]="nuevoCamion.Identificador" required>
+    </mat-form-field>
 
-    <label for="matricula">Matrícula:</label>
-    <input type="text" id="matricula" name="matricula" [(ngModel)]="nuevoCamion.Matricula" required>
-    <br>
+    <mat-form-field  appearance="outline" class="full-width">
+      <mat-label>Matrícula</mat-label>
+      <input matInput type="text" id="matricula" name="matricula" [(ngModel)]="nuevoCamion.Matricula" required>
+    </mat-form-field>
 
-    <label for="marca">Marca:</label>
-    <input type="text" id="marca" name="marca" [(ngModel)]="nuevoCamion.Marca" required>
-    <br>
+    <mat-form-field  appearance="outline" class="full-width">
+      <mat-label>Marca</mat-label>
+      <input matInput type="text" id="marca" name="marca" [(ngModel)]="nuevoCamion.Marca" required>
+    </mat-form-field>
 
-    <label for="modelo">Modelo:</label>
-    <input type="text" id="modelo" name="modelo" [(ngModel)]="nuevoCamion.Modelo" required>
-    <br>
+    <mat-form-field  appearance="outline" class="full-width">
+      <mat-label>Modelo</mat-label>
+      <input matInput type="text" id="modelo" name="modelo" [(ngModel)]="nuevoCamion.Modelo" required>
+    </mat-form-field>
 
-    <button type="submit"  mat-raised-button class="btn-actualizar">{{ modoEdicion ? 'Actualizar Camión' : 'Crear Camión' }}</button>
-    <button type="button" mat-raised-button  class="btn-cancelar" (click)="cerrarFormulario()">Cerrar</button>
+    <div class="botones-formulario">
+      <button mat-raised-button color="primary" type="submit" class="btn-actualizar">
+        {{ modoEdicion ? 'Actualizar Camión' : 'Crear Camión' }}
+      </button>
+      <button mat-raised-button class="btn-cancelar" type="button" class="btn-cancelar" (click)="cerrarFormulario()">
+        Cerrar
+      </button>
+    </div>
   </form>
 </div>

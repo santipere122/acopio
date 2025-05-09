@@ -9,12 +9,18 @@ import { ClientesModule } from './clientes/clientes.module';
 import { ChoferesModule } from './choferes/choferes.module';
 import { CamionesModule } from './camiones/camiones.module';
 import { AcopioModule } from './acopio/acopio.module';
+import { MatButtonModule } from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatTableModule } from '@angular/material/table';
+import { MatIconModule } from '@angular/material/icon';
 
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule,  RouterOutlet, FormsModule, UsuarioModule, LoginModule, ClientesModule, ChoferesModule, CamionesModule, AcopioModule ], 
+  imports: [CommonModule,  RouterOutlet, FormsModule, UsuarioModule, LoginModule, ClientesModule, ChoferesModule, CamionesModule, AcopioModule,MatButtonModule, MatInputModule,MatSelectModule,MatTableModule,
+    MatIconModule],
   templateUrl: './app.component.html', 
   styleUrls: ['./app.component.css']     
 })

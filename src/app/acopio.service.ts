@@ -7,7 +7,7 @@ import { environment } from '../environments/environment';
   providedIn: 'root'
 })
 export class AcopioService {
-  private apiUrl = `${environment.apiUrl}/acopios`; 
+  private apiUrl = `${environment.apiUrl}/acopios`;
 
   constructor(private http: HttpClient) {}
 
@@ -31,9 +31,15 @@ export class AcopioService {
     const body = { fecha, chofer, camion };
     return this.http.post(url, body);
   }
-  completarAcopio(id_acopio: number, monto_pagar: string, fecha: string): Observable<any> {
+  completarAcopio(id_acopio: number, monto_pagar: string, fecha: string, cantidad: number): Observable<any> {
     const url = `${this.apiUrl}/completar`;
-    const body = { id_acopio, monto_pagar, fecha };
+    const body = { id_acopio, monto_pagar, fecha, cantidad };
+    return this.http.post<any>(url, body);
+  }
+
+  reasignarAcopio(id_acopio: number, choferNuevo: number, camionNuevo: number): Observable<any> {
+    const url = `${this.apiUrl}/reasignar`;
+    const body = { id_acopio, chofer_nuevo: choferNuevo, camion_nuevo: camionNuevo };
     return this.http.post<any>(url, body);
   }
 }

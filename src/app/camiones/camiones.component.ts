@@ -14,6 +14,8 @@ export class CamionesComponent implements OnInit {
   camiones: Camion[] = [];
   camionSeleccionado: Camion | null = null;
   nuevoCamion: Camion = this.initNuevoCamion();
+  displayedColumns: string[] = ['Identificador', 'Matricula', 'Marca', 'Modelo', 'Acciones'];
+
 
   constructor(private camionesService: CamionesService, private router: Router) { }
 

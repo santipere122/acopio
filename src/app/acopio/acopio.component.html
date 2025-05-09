@@ -1,41 +1,67 @@
 <div class="container">
   <div class="left-panel">
     <div *ngIf="!mostrarFormulario" class="table-container">
-      <form *ngIf="isChofer()" [formGroup]="programarAcopioForm" (ngSubmit)="iniciarDia()">
-        <input type="hidden" formControlName="chofer">
-        <mat-form-field appearance="fill">
-          <mat-label>Camión:</mat-label>
-          <mat-select formControlName="camion">
-            <mat-option *ngFor="let camion of camiones" [value]="camion.id_camion">{{ camion.Identificador }}</mat-option>
-          </mat-select>
-        </mat-form-field>
-        <button mat-raised-button color="accent" type="submit" [disabled]="!programarAcopioForm.valid">Iniciar día</button>
-      </form>
+<!-- Formulario para Chofer -->
+<form *ngIf="isChofer()" [formGroup]="programarAcopioForm" (ngSubmit)="iniciarDia()" fxLayout="column" fxLayoutGap="20px">
+  <input type="hidden" formControlName="chofer">
 
-      <form *ngIf="isAdmin()" [formGroup]="programarAcopioForm" (ngSubmit)="iniciarDia()">
-        <input type="hidden" formControlName="chofer">
-        <mat-form-field appearance="fill">
-          <mat-label>Chofer:</mat-label>
-          <mat-select formControlName="chofer">
-            <mat-option *ngFor="let chofer of choferes" [value]="chofer.id_chofer">{{ chofer.Nombre }}</mat-option>
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field appearance="fill">
-          <mat-label>Camión:</mat-label>
-          <mat-select formControlName="camion">
-            <mat-option *ngFor="let camion of camiones" [value]="camion.id_camion">{{ camion.Identificador }}</mat-option>
-          </mat-select>
-        </mat-form-field>
-        <button mat-raised-button color="accent" type="submit" [disabled]="!programarAcopioForm.get('chofer')?.value || !programarAcopioForm.get('camion')?.value">Iniciar día</button>
-      </form>
-      
+  <mat-form-field appearance="fill" class="full-width" style="margin-left: 10px; margin-right: 10px;">
+    <mat-label>Camión</mat-label>
+    <mat-select formControlName="camion">
+      <mat-option *ngFor="let camion of camiones" [value]="camion.id_camion">{{ camion.Identificador }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill" class="full-width" style="margin-left: 10px; margin-right: 10px;">
+    <mat-label>Fecha</mat-label>
+    <input matInput [matDatepicker]="picker" formControlName="fecha">
+    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+  </mat-form-field>
+
+  <div style="margin-left: 10px; margin-right: 10px;">
+    <button mat-raised-button class="btn-crear" type="submit" [disabled]="!programarAcopioForm.valid">Iniciar día</button>
+  </div>
+</form>
+
+
+<form *ngIf="isAdmin()" [formGroup]="programarAcopioForm" (ngSubmit)="iniciarDia()" fxLayout="column" fxLayoutGap="20px">
+
+  <mat-form-field appearance="fill" class="full-width" style="margin-left: 10px; margin-right: 10px;">
+    <mat-label>Chofer</mat-label>
+    <mat-select formControlName="chofer">
+      <mat-option *ngFor="let chofer of choferes" [value]="chofer.id_chofer">{{ chofer.Nombre }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill" class="custom-field-size" style="margin-left: 10px; margin-right: 10px;">
+    <mat-label>Camión</mat-label>
+    <mat-select formControlName="camion">
+      <mat-option *ngFor="let camion of camiones" [value]="camion.id_camion">{{ camion.Identificador }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill" class="full-width" style="margin-left: 10px; margin-right: 10px;">
+    <mat-label>Fecha</mat-label>
+    <input matInput [matDatepicker]="picker" formControlName="fecha">
+    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+  </mat-form-field>
+
+  <div style="margin-left: 5px; margin-right: 5px;">
+    <button mat-raised-button class="btn-crear" type="submit" [disabled]="!programarAcopioForm.valid">
+      Iniciar día
+    </button>
+  </div>
+</form>
+ <br>
+
       <div class="filter-container">
-        <mat-form-field appearance="fill">
-          <mat-label>Fecha:</mat-label>
-          <input matInput [matDatepicker]="picker" [(ngModel)]="filtroFecha" name="filtroFecha" [disabled]="isChofer()">
-          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-          <mat-datepicker #picker></mat-datepicker>
-        </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>Fecha:</mat-label>
+            <input matInput type="date" [(ngModel)]="filtroFecha" name="filtroFecha" [disabled]="isChofer()">
+          </mat-form-field>
 
         <mat-form-field appearance="fill">
           <mat-label>Chofer:</mat-label>
@@ -55,13 +81,15 @@
           </mat-select>
         </mat-form-field>
 
+
+
         <br>
-        <button mat-raised-button color="primary" (click)="aplicarFiltro()">Aplicar Filtro</button>
-        <button mat-raised-button color="warn" (click)="quitarFiltro()">Quitar Filtro</button>
-        <button mat-raised-button  (click)="downloadPDF()">  <mat-icon>picture_as_pdf</mat-icon></button>
-        <button mat-raised-button  (click)="Imprimir()">  <mat-icon>print</mat-icon></button>
+        <button mat-raised-button class="btn-filtro" (click)="aplicarFiltro()">Aplicar Filtro</button>
+        <button mat-raised-button class="btn-filtro" (click)="quitarFiltro()">Quitar Filtro</button>
+        <button mat-raised-button class="btn-filtro" (click)="downloadPDF()">  <mat-icon>picture_as_pdf</mat-icon></button>
+        <button mat-raised-button class="btn-filtro" (click)="Imprimir()">  <mat-icon>print</mat-icon></button>
       </div>
-      
+
       <div id="print-section" #printSection>
         <table mat-table [dataSource]="acopiosFiltrados" class="mat-elevation-z8 table-style">
             <ng-container matColumnDef="fecha">
@@ -99,15 +127,15 @@
             <ng-container matColumnDef="acciones">
                 <th mat-header-cell *matHeaderCellDef class="no-print"> Acciones </th>
                 <td mat-cell *matCellDef="let acopio" class="no-print">
-                    <button mat-raised-button color="primay" class="btn-actualizar" *ngIf="isAdmin()" (click)="seleccionarAcopio(acopio)"><mat-icon>edit</mat-icon></button>
-                    <button mat-raised-button color="warn" *ngIf="isAdmin()" (click)="eliminarAcopio(acopio.id_acopio)"><mat-icon>delete</mat-icon></button>
-                    <button mat-raised-button color="primary" (click)="mostrarFormularioCompletarAcopio(acopio)">  <mat-icon>done</mat-icon> </button>
+                    <button  mat-icon-button class="btn-editar" *ngIf="isAdmin()" (click)="seleccionarAcopio(acopio)"><mat-icon>edit</mat-icon></button>
+                    <button mat-icon-button class="btn-eliminar" *ngIf="isAdmin()" (click)="eliminarAcopio(acopio.id_acopio)"><mat-icon>delete</mat-icon></button>
+                    <button  mat-icon-button class="btn-editar" (click)="mostrarFormularioCompletarAcopio(acopio)">  <mat-icon>done</mat-icon> </button>
                 </td>
             </ng-container>
             <tr mat-header-row *matHeaderRowDef="['fecha', 'cliente', 'chofer', 'camion', 'cantidad', 'estado', 'codigoPostal', 'direccion', 'acciones']"></tr>
             <tr mat-row *matRowDef="let row; columns: ['fecha', 'cliente', 'chofer', 'camion', 'cantidad', 'estado', 'codigoPostal', 'direccion', 'acciones'];"></tr>
         </table>
-    </div>      
+    </div>
       <iframe id="pdf-viewer" width="100%" height="600px"></iframe>
     </div>
 
@@ -116,7 +144,9 @@
       <form class="formulario" (ngSubmit)="modoEdicion ? actualizarAcopio() : crearAcopio()">
         <mat-form-field appearance="fill">
           <mat-label>Fecha:</mat-label>
-          <input matInput type="date" [(ngModel)]="nuevoAcopio.Fecha" name="Fecha" required>
+          <input matInput [matDatepicker]="picker" [(ngModel)]="nuevoAcopio.fecha" name="Fecha">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
         </mat-form-field>
 
         <mat-form-field appearance="fill">
@@ -164,8 +194,8 @@
       </form>
     </div>
   </div>
-  
-  <div class="right-panel">
+
+  <div class="right-panel" [ngClass]="{ 'oculto': mostrarFormularioReasignar }">
     <mat-card class="map-card">
       <mat-card-header>
         <mat-card-title>Mapa de Acopios</mat-card-title>
@@ -175,7 +205,9 @@
       </mat-card-content>
     </mat-card>
   </div>
-  
+
+
+
   <div *ngIf="acopiosFiltrados.length === 0" class="mensaje-error">
     No se encontraron acopios en la fecha seleccionada.
   </div>
@@ -188,7 +220,10 @@
           <mat-label>Monto a Pagar:</mat-label>
           <input matInput formControlName="monto_pagar" type="number" required />
         </mat-form-field>
-        
+        <mat-form-field appearance="fill">
+          <mat-label>Cantidad:</mat-label>
+          <input matInput formControlName="cantidad" type="number" required />
+        </mat-form-field>
         <button mat-raised-button color="primary" type="submit" [disabled]="completarAcopioForm.invalid">Completar</button>
         <button mat-raised-button color="warn" type="button" (click)="cerrarModal()">  <mat-icon>cancel</mat-icon></button>
       </form>

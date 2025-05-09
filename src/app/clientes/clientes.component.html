@@ -71,10 +71,10 @@
       <ng-container matColumnDef="ACCIONES" *ngIf="isAdmin()">
         <th mat-header-cell *matHeaderCellDef>ACCIONES</th>
         <td mat-cell *matCellDef="let cliente">
-          <button mat-icon-button color="primary" (click)="seleccionarCliente(cliente)">
+          <button mat-icon-button  class="btn-editar" (click)="seleccionarCliente(cliente)">
             <mat-icon>edit</mat-icon>
           </button>
-          <button mat-icon-button color="warn" (click)="eliminarCliente(cliente.id_cliente)">
+          <button mat-icon-button class="btn-eliminar" (click)="eliminarCliente(cliente.id_cliente)">
             <mat-icon>delete</mat-icon>
           </button>
         </td>
