@@ -1,6 +1,6 @@
 {
   "/api": {
-    "target": "http://localhost:3300",
+    "target": "https://acopio.zapto.org",
     "secure": false,
     "changeOrigin": true,
     "logLevel": "debug"
